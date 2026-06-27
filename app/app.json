@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "ChoreScore",
+    "slug": "chore-score",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/Banner-Family.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#e8faf4"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.chorescore.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Used for chore proof photos"
+      }
+    },
+    "android": {
+      "package": "com.chorescore.app",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#53a687"
+      }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/icon.png",
+          "color": "#53a687"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "YOUR_EAS_PROJECT_ID"
+      }
+    }
+  }
+}

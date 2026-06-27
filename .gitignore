@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+backend/node_modules/
+app/node_modules/
+
+# CDK
+backend/cdk.out/
+backend/dist/
+
+# Expo
+app/.expo/
+app/dist/
+
+# Environment
+app/.env
+*.local
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Playwright
+tests/test-results/
+tests/results.json
+
+# Logs
+*.log
+npm-debug.log*

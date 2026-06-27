@@ -1,0 +1,33 @@
+{
+  "name": "chore-score-backend",
+  "version": "0.1.0",
+  "bin": {
+    "backend": "bin/app.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "deploy": "cdk deploy --require-approval never",
+    "destroy": "cdk destroy",
+    "synth": "cdk synth"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.131",
+    "@types/node": "^20.0.0",
+    "aws-cdk": "^2.170.0",
+    "esbuild": "^0.20.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.540.0",
+    "@aws-sdk/client-dynamodb": "^3.540.0",
+    "@aws-sdk/client-pinpoint": "^3.540.0",
+    "@aws-sdk/lib-dynamodb": "^3.540.0",
+    "aws-cdk-lib": "^2.170.0",
+    "constructs": "^10.0.0",
+    "uuid": "^9.0.0",
+    "@types/uuid": "^9.0.0"
+  }
+}
