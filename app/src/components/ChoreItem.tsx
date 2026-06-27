@@ -41,14 +41,16 @@ export function ChoreItem({ chore, onComplete, onEdit, onDelete, completing }: P
 
       <View style={styles.info}>
         <View style={styles.row}>
-          <Text style={styles.emoji}>{chore.emoji}</Text>
+          <View style={styles.emojiWrap}>
+            <Text style={styles.emoji}>{chore.emoji}</Text>
+          </View>
           <Text style={[styles.name, chore.completedThisPeriod && styles.nameStruck]}>
             {chore.name}
           </Text>
         </View>
         <View style={styles.row}>
           <View style={styles.weightPill}>
-            <Text style={styles.weightText}>+{chore.weight} pts · {WEIGHT_LABEL[chore.weight]}</Text>
+            <Text style={styles.weightText}>+{chore.weight} · {WEIGHT_LABEL[chore.weight]}</Text>
           </View>
           <Text style={styles.freq}>{chore.frequency}</Text>
         </View>
@@ -78,20 +80,18 @@ export function ChoreItem({ chore, onComplete, onEdit, onDelete, completing }: P
 const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
     padding: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.sm,
     ...shadow.sm,
   },
-  completed: {
-    opacity: 0.6,
-  },
+  completed: { opacity: 0.55 },
   checkArea: { marginRight: spacing.sm },
   check: {
-    width: 28,
-    height: 28,
+    width: 30,
+    height: 30,
     borderRadius: radius.full,
     borderWidth: 2,
     borderColor: colors.border,
@@ -104,15 +104,21 @@ const styles = StyleSheet.create({
   },
   checkMark: { color: colors.white, fontSize: 14, fontWeight: '800' },
   info: { flex: 1 },
-  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 2 },
-  emoji: { fontSize: 18, marginRight: spacing.xs },
+  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  emojiWrap: {
+    width: 28, height: 28, borderRadius: radius.sm,
+    backgroundColor: colors.background,
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: spacing.xs,
+  },
+  emoji: { fontSize: 16 },
   name: { fontSize: fontSize.md, fontWeight: '600', color: colors.text.primary, flex: 1 },
   nameStruck: { textDecorationLine: 'line-through', color: colors.text.light },
   weightPill: {
     backgroundColor: colors.highlight,
     borderRadius: radius.full,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 3,
     marginRight: spacing.sm,
   },
   weightText: { fontSize: fontSize.xs, fontWeight: '700', color: colors.text.secondary },

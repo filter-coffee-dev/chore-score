@@ -39,7 +39,6 @@ export default function HistoryScreen() {
     setRefreshing(false);
   }
 
-  // Group by date
   const grouped: { date: string; items: Completion[] }[] = [];
   for (const c of completions) {
     const date = formatDate(c.completedAt);
@@ -52,7 +51,9 @@ export default function HistoryScreen() {
     const isMe = item.userId === userId;
     return (
       <View style={[styles.item, isMe && styles.itemMe]}>
-        <Text style={styles.itemEmoji}>{item.choreEmoji}</Text>
+        <View style={styles.itemEmojiWrap}>
+          <Text style={styles.itemEmoji}>{item.choreEmoji}</Text>
+        </View>
         <View style={styles.itemInfo}>
           <Text style={styles.itemName}>{item.choreName}</Text>
           <Text style={styles.itemMeta}>
@@ -67,10 +68,10 @@ export default function HistoryScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Text style={styles.title}>History 📋</Text>
-        <TouchableOpacity onPress={onRefresh}>
+        <TouchableOpacity onPress={onRefresh} style={styles.refreshBtn}>
           <Text style={styles.refreshIcon}>🔄</Text>
         </TouchableOpacity>
       </View>
@@ -104,31 +105,39 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.md, paddingVertical: spacing.md,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-    backgroundColor: colors.white,
   },
   title: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary },
-  refreshIcon: { fontSize: 20 },
-  list: { padding: spacing.md, paddingBottom: spacing.xxl },
+  refreshBtn: {
+    backgroundColor: colors.white, borderRadius: radius.full,
+    padding: spacing.sm, ...shadow.sm,
+  },
+  refreshIcon: { fontSize: 18 },
+  list: { paddingHorizontal: spacing.md, paddingBottom: 110 },
   group: { marginBottom: spacing.lg },
   dateLabel: {
-    fontSize: fontSize.sm, fontWeight: '700', color: colors.text.light,
-    textTransform: 'uppercase', letterSpacing: 1, marginBottom: spacing.sm,
+    fontSize: fontSize.xs, fontWeight: '700', color: colors.text.light,
+    textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: spacing.sm,
   },
   item: {
     flexDirection: 'row', alignItems: 'center',
-    backgroundColor: colors.white, borderRadius: radius.md,
+    backgroundColor: colors.white, borderRadius: radius.lg,
     padding: spacing.md, marginBottom: spacing.sm,
     ...shadow.sm,
   },
   itemMe: { borderLeftWidth: 3, borderLeftColor: colors.primary },
-  itemEmoji: { fontSize: 24, marginRight: spacing.sm },
+  itemEmojiWrap: {
+    width: 44, height: 44, borderRadius: radius.md,
+    backgroundColor: colors.background,
+    alignItems: 'center', justifyContent: 'center',
+    marginRight: spacing.sm,
+  },
+  itemEmoji: { fontSize: 22 },
   itemInfo: { flex: 1 },
   itemName: { fontSize: fontSize.md, fontWeight: '600', color: colors.text.primary },
   itemMeta: { fontSize: fontSize.sm, color: colors.text.secondary, marginTop: 2 },
   points: {
     backgroundColor: colors.highlight, borderRadius: radius.full,
-    paddingHorizontal: spacing.sm, paddingVertical: 2,
+    paddingHorizontal: spacing.sm, paddingVertical: 4,
   },
   pointsMe: { backgroundColor: colors.secondary },
   pointsText: { fontSize: fontSize.sm, fontWeight: '700', color: colors.text.secondary },

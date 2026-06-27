@@ -10,7 +10,8 @@ export function TauntBanner({ taunt }: Props) {
   if (!taunt) return null;
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>"{taunt}"</Text>
+      <Text style={styles.quote}>"</Text>
+      <Text style={styles.text}>{taunt}</Text>
     </View>
   );
 }
@@ -18,11 +19,18 @@ export function TauntBanner({ taunt }: Props) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.accent,
-    borderRadius: radius.md,
-    padding: spacing.md,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
     marginHorizontal: spacing.md,
     marginVertical: spacing.sm,
     ...shadow.sm,
+  },
+  quote: {
+    fontSize: 32,
+    fontWeight: '900',
+    color: 'rgba(26,58,46,0.2)',
+    lineHeight: 24,
+    marginBottom: -4,
   },
   text: {
     fontSize: fontSize.sm,

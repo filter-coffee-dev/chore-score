@@ -1,10 +1,11 @@
 import React from 'react';
+import { View } from 'react-native';
+import { Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { colors } from '../theme';
+import { colors, shadow } from '../theme';
 
 import SignInScreen from '../screens/auth/SignInScreen';
 import SignUpScreen from '../screens/auth/SignUpScreen';
@@ -42,26 +43,41 @@ const RootStack = createStackNavigator<RootStackParams>();
 
 function tabIcon(emoji: string) {
   return ({ focused }: { focused: boolean }) => (
-    <Text style={{ fontSize: 22, opacity: focused ? 1 : 0.5 }}>{emoji}</Text>
+    <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.45 }}>{emoji}</Text>
   );
 }
 
 function MainTabs() {
   const insets = useSafeAreaInsets();
+  const tabBarBottom = Math.max(insets.bottom, 8) + 12;
+
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
+          position: 'absolute',
+          bottom: tabBarBottom,
+          left: 16,
+          right: 16,
           backgroundColor: colors.white,
-          borderTopColor: colors.border,
-          paddingBottom: 6 + insets.bottom,
-          paddingTop: 6,
-          height: 64 + insets.bottom,
+          borderTopWidth: 0,
+          borderRadius: 24,
+          height: 64,
+          paddingTop: 8,
+          paddingBottom: 8,
+          ...shadow.lg,
         },
+        tabBarBackground: () => (
+          <View style={{
+            flex: 1,
+            backgroundColor: colors.white,
+            borderRadius: 24,
+          }} />
+        ),
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.text.light,
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: '700', marginTop: 1 },
       }}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{ tabBarIcon: tabIcon('🏠'), tabBarLabel: 'Home' }} />

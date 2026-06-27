@@ -46,17 +46,24 @@ export const fontSize = {
 
 export const shadow = {
   sm: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.06,
-    shadowRadius: 4,
-    elevation: 2,
+    shadowColor: '#1a3a2e',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.07,
+    shadowRadius: 6,
+    elevation: 3,
   },
   md: {
-    shadowColor: '#000',
+    shadowColor: '#1a3a2e',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.10,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowRadius: 12,
+    elevation: 6,
+  },
+  lg: {
+    shadowColor: '#1a3a2e',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.13,
+    shadowRadius: 20,
+    elevation: 12,
   },
 };

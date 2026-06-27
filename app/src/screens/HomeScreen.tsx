@@ -59,25 +59,25 @@ export default function HomeScreen() {
   const partnerPoints = partnerScore?.totalPoints ?? 0;
   const imLeading = myPoints >= partnerPoints;
 
-  // Show today's chores (daily + weekly if not done)
   const todayChores = chores.filter((c) => c.frequency === 'daily' || !c.completedThisPeriod);
   const pendingCount = todayChores.filter((c) => !c.completedThisPeriod).length;
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
-        {/* Banner */}
-        <Image source={require('../../assets/Banner-Family.png')} style={styles.banner} resizeMode="cover" />
-
-        {/* Greeting + Refresh */}
-        <View style={styles.greetingRow}>
-          <Text style={styles.greeting}>Hey {userName?.split(' ')[0]}! 👋</Text>
-          <TouchableOpacity onPress={onRefresh} style={styles.refreshBtn}>
-            <Text style={styles.refreshIcon}>🔄</Text>
-          </TouchableOpacity>
+        {/* Hero banner with rounded bottom */}
+        <View style={styles.bannerWrap}>
+          <Image source={require('../../assets/Banner-Family.png')} style={styles.banner} resizeMode="cover" />
+          <View style={styles.bannerOverlay}>
+            <Text style={styles.greeting}>Hey {userName?.split(' ')[0]}! 👋</Text>
+            <TouchableOpacity onPress={onRefresh} style={styles.refreshBtn}>
+              <Text style={styles.refreshIcon}>🔄</Text>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {/* Score Cards */}
@@ -116,7 +116,7 @@ export default function HomeScreen() {
           {todayChores.length === 0 ? (
             <View style={styles.emptyChores}>
               <Text style={styles.emptyEmoji}>🧹</Text>
-              <Text style={styles.emptyText}>No chores set up yet.</Text>
+              <Text style={styles.emptyTitle}>No chores set up yet.</Text>
               <Text style={styles.emptySubtext}>Go to Chores tab to add some. Yes, now.</Text>
             </View>
           ) : (
@@ -137,23 +137,33 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  banner: { width: '100%', height: 210 },
-  greetingRow: {
+  scrollContent: { paddingBottom: 110 },
+  bannerWrap: {
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
+    marginBottom: spacing.md,
+  },
+  banner: { width: '100%', height: 220 },
+  bannerOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.md,
-    paddingBottom: spacing.sm,
+    paddingVertical: spacing.sm,
+    backgroundColor: 'rgba(26,58,46,0.35)',
   },
-  greeting: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary },
+  greeting: { fontSize: fontSize.lg, fontWeight: '800', color: colors.white },
   refreshBtn: {
-    backgroundColor: colors.white,
+    backgroundColor: 'rgba(255,255,255,0.25)',
     borderRadius: radius.full,
     padding: spacing.sm,
-    ...shadow.sm,
   },
-  refreshIcon: { fontSize: 18 },
+  refreshIcon: { fontSize: 16 },
   scoresRow: {
     flexDirection: 'row',
     paddingHorizontal: spacing.md,
@@ -163,11 +173,11 @@ const styles = StyleSheet.create({
     margin: spacing.md,
     padding: spacing.lg,
     backgroundColor: colors.white,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     alignItems: 'center',
     ...shadow.sm,
   },
-  section: { padding: spacing.md },
+  section: { paddingHorizontal: spacing.md, paddingTop: spacing.sm },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -178,7 +188,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     borderRadius: radius.full,
     paddingHorizontal: spacing.sm,
-    paddingVertical: 2,
+    paddingVertical: 3,
   },
   badgeText: { fontSize: fontSize.xs, fontWeight: '700', color: colors.text.primary },
   allDone: { fontSize: fontSize.sm, fontWeight: '700', color: colors.primary },
@@ -186,10 +196,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: spacing.xl,
     backgroundColor: colors.white,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     ...shadow.sm,
   },
   emptyEmoji: { fontSize: 48, marginBottom: spacing.sm },
-  emptyText: { fontSize: fontSize.md, fontWeight: '700', color: colors.text.primary, textAlign: 'center' },
+  emptyTitle: { fontSize: fontSize.md, fontWeight: '700', color: colors.text.primary, textAlign: 'center' },
   emptySubtext: { fontSize: fontSize.sm, color: colors.text.secondary, textAlign: 'center', marginTop: spacing.xs },
+  emptyText: { fontSize: fontSize.md, fontWeight: '600', color: colors.text.secondary, textAlign: 'center' },
 });

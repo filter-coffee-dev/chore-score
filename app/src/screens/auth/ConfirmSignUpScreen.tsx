@@ -51,24 +51,26 @@ export default function ConfirmSignUpScreen({ navigation, route }: Props) {
           We sent a 6-digit code to{'\n'}<Text style={styles.email}>{email}</Text>
         </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Enter code"
-          placeholderTextColor={colors.text.light}
-          value={code}
-          onChangeText={setCode}
-          keyboardType="number-pad"
-          maxLength={6}
-          textAlign="center"
-        />
+        <View style={styles.card}>
+          <TextInput
+            style={styles.input}
+            placeholder="Enter code"
+            placeholderTextColor={colors.text.light}
+            value={code}
+            onChangeText={setCode}
+            keyboardType="number-pad"
+            maxLength={6}
+            textAlign="center"
+          />
 
-        <TouchableOpacity style={styles.btn} onPress={handleConfirm} disabled={loading}>
-          <Text style={styles.btnText}>{loading ? 'Confirming...' : 'Confirm! ✅'}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity style={styles.btn} onPress={handleConfirm} disabled={loading}>
+            <Text style={styles.btnText}>{loading ? 'Confirming...' : 'Confirm! ✅'}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleResend} style={styles.link}>
-          <Text style={styles.linkText}>Didn't get it? Resend →</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={handleResend} style={styles.link}>
+            <Text style={styles.linkText}>Didn't get it? Resend →</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </SafeAreaView>
   );
@@ -81,29 +83,33 @@ const styles = StyleSheet.create({
   title: { fontSize: fontSize.xxl, fontWeight: '800', color: colors.text.primary, marginBottom: spacing.sm },
   subtitle: { fontSize: fontSize.md, color: colors.text.secondary, textAlign: 'center', marginBottom: spacing.xl },
   email: { fontWeight: '700', color: colors.primary },
-  input: {
+  card: {
+    width: '100%',
     backgroundColor: colors.white,
-    borderRadius: radius.md,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
+    ...shadow.md,
+  },
+  input: {
+    backgroundColor: colors.background,
+    borderRadius: radius.lg,
     padding: spacing.md,
     fontSize: fontSize.xl,
     fontWeight: '700',
     color: colors.text.primary,
     borderWidth: 1,
     borderColor: colors.border,
-    width: '100%',
     letterSpacing: 8,
-    ...shadow.sm,
+    marginBottom: spacing.sm,
   },
   btn: {
     backgroundColor: colors.primary,
-    borderRadius: radius.md,
+    borderRadius: radius.full,
     padding: spacing.md,
     alignItems: 'center',
-    width: '100%',
-    marginTop: spacing.md,
     ...shadow.sm,
   },
   btnText: { color: colors.white, fontSize: fontSize.md, fontWeight: '700' },
-  link: { marginTop: spacing.lg },
+  link: { alignItems: 'center', marginTop: spacing.lg },
   linkText: { color: colors.primary, fontSize: fontSize.sm, fontWeight: '600' },
 });

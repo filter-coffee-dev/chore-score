@@ -16,9 +16,9 @@ export function ScoreCard({ score, isMe, isLeading }: Props) {
       <Text style={styles.name} numberOfLines={1}>
         {isMe ? 'You' : score.userName}
       </Text>
-      <Text style={styles.points}>{score.totalPoints}</Text>
+      <Text style={[styles.points, isLeading && styles.pointsLeading]}>{score.totalPoints}</Text>
       <Text style={styles.label}>pts</Text>
-      <Text style={styles.completions}>{score.totalCompletions} chores</Text>
+      <Text style={styles.completions}>{score.totalCompletions} chores done</Text>
     </View>
   );
 }
@@ -27,37 +27,41 @@ const styles = StyleSheet.create({
   card: {
     flex: 1,
     backgroundColor: colors.white,
-    borderRadius: radius.lg,
-    padding: spacing.md,
+    borderRadius: radius.xl,
+    padding: spacing.lg,
     alignItems: 'center',
     marginHorizontal: spacing.xs,
-    ...shadow.sm,
+    ...shadow.md,
     borderWidth: 2,
     borderColor: 'transparent',
   },
   mine: {
-    borderColor: colors.secondary,
+    borderColor: colors.border,
   },
   leading: {
     backgroundColor: colors.highlight,
     borderColor: colors.secondary,
   },
   crown: {
-    fontSize: 20,
-    marginBottom: 2,
+    fontSize: 22,
+    marginBottom: spacing.xs,
   },
   name: {
-    fontSize: fontSize.sm,
+    fontSize: fontSize.xs,
     fontWeight: '700',
     color: colors.text.secondary,
     textTransform: 'uppercase',
-    letterSpacing: 1,
+    letterSpacing: 1.5,
+    marginBottom: 2,
   },
   points: {
     fontSize: fontSize.hero,
     fontWeight: '900',
     color: colors.text.primary,
     lineHeight: fontSize.hero + 4,
+  },
+  pointsLeading: {
+    color: colors.primary,
   },
   label: {
     fontSize: fontSize.sm,

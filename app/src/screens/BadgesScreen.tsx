@@ -9,7 +9,9 @@ import { colors, spacing, fontSize, radius, shadow } from '../theme';
 function BadgeCard({ badge, earned }: { badge: BadgeDef; earned?: Badge }) {
   return (
     <View style={[styles.badgeCard, !earned && styles.badgeLocked]}>
-      <Text style={[styles.badgeEmoji, !earned && styles.badgeEmojiLocked]}>{badge.emoji}</Text>
+      <View style={[styles.badgeIconWrap, earned && styles.badgeIconEarned]}>
+        <Text style={[styles.badgeEmoji, !earned && styles.badgeEmojiLocked]}>{badge.emoji}</Text>
+      </View>
       <Text style={[styles.badgeName, !earned && styles.badgeNameLocked]}>{badge.name}</Text>
       <Text style={styles.badgeDesc} numberOfLines={2}>{badge.description}</Text>
       {earned?.earnedAt && (
@@ -17,7 +19,7 @@ function BadgeCard({ badge, earned }: { badge: BadgeDef; earned?: Badge }) {
           {new Date(earned.earnedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
         </Text>
       )}
-      {!earned && <Text style={styles.locked}>🔒 Locked</Text>}
+      {!earned && <Text style={styles.locked}>🔒</Text>}
     </View>
   );
 }
@@ -42,7 +44,7 @@ export default function BadgesScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Text style={styles.title}>Badges 🏅</Text>
       </View>
@@ -92,38 +94,44 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: {
     paddingHorizontal: spacing.md, paddingVertical: spacing.md,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-    backgroundColor: colors.white,
   },
   title: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary },
-  content: { padding: spacing.md, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.md, paddingBottom: 110 },
   memberSection: { marginBottom: spacing.xl },
   memberHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
   memberName: { fontSize: fontSize.lg, fontWeight: '800', color: colors.text.primary, flex: 1 },
   countBadge: {
     backgroundColor: colors.secondary, borderRadius: radius.full,
-    paddingHorizontal: spacing.sm, paddingVertical: 2,
+    paddingHorizontal: spacing.sm, paddingVertical: 4,
   },
   countText: { fontSize: fontSize.xs, fontWeight: '700', color: colors.text.primary },
   noBadges: {
-    backgroundColor: colors.white, borderRadius: radius.md,
+    backgroundColor: colors.white, borderRadius: radius.lg,
     padding: spacing.md, marginBottom: spacing.md, alignItems: 'center',
+    ...shadow.sm,
   },
   noBadgesText: { fontSize: fontSize.sm, color: colors.text.secondary },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   badgeCard: {
-    backgroundColor: colors.white, borderRadius: radius.lg,
+    backgroundColor: colors.white, borderRadius: radius.xl,
     padding: spacing.md, alignItems: 'center',
-    width: '47%', ...shadow.sm,
+    width: '47%', ...shadow.md,
   },
-  badgeLocked: { opacity: 0.5 },
-  badgeEmoji: { fontSize: 36, marginBottom: spacing.xs },
-  badgeEmojiLocked: { opacity: 0.4 },
+  badgeLocked: { opacity: 0.45 },
+  badgeIconWrap: {
+    width: 56, height: 56, borderRadius: radius.lg,
+    backgroundColor: colors.background,
+    alignItems: 'center', justifyContent: 'center',
+    marginBottom: spacing.sm,
+  },
+  badgeIconEarned: { backgroundColor: colors.highlight },
+  badgeEmoji: { fontSize: 32 },
+  badgeEmojiLocked: { opacity: 0.5 },
   badgeName: { fontSize: fontSize.sm, fontWeight: '800', color: colors.text.primary, textAlign: 'center', marginBottom: 2 },
   badgeNameLocked: { color: colors.text.light },
   badgeDesc: { fontSize: fontSize.xs, color: colors.text.secondary, textAlign: 'center', lineHeight: 16 },
   earnedAt: { fontSize: fontSize.xs, color: colors.primary, fontWeight: '700', marginTop: spacing.xs },
-  locked: { fontSize: fontSize.xs, color: colors.text.light, marginTop: spacing.xs },
+  locked: { fontSize: fontSize.sm, color: colors.text.light, marginTop: spacing.xs },
   empty: { alignItems: 'center', padding: spacing.xxl },
   emptyEmoji: { fontSize: 64, marginBottom: spacing.md },
   emptyTitle: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary, marginBottom: spacing.sm },

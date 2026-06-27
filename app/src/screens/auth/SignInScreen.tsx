@@ -31,7 +31,6 @@ export default function SignInScreen({ navigation }: Props) {
       try {
         const household = await api.household.get();
         setHousehold(household);
-        // Navigation will auto-update via App.tsx state
       } catch {
         navigation.navigate('HouseholdSetup');
       }
@@ -54,10 +53,12 @@ export default function SignInScreen({ navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <Image source={require('../../../assets/Banner-Family.png')} style={styles.banner} resizeMode="cover" />
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={styles.bannerWrap}>
+            <Image source={require('../../../assets/Banner-Family.png')} style={styles.banner} resizeMode="cover" />
+          </View>
 
           <View style={styles.card}>
             <Text style={styles.title}>Welcome back! 👋</Text>
@@ -82,7 +83,7 @@ export default function SignInScreen({ navigation }: Props) {
             />
 
             <TouchableOpacity style={styles.btn} onPress={handleSignIn} disabled={loading}>
-              <Text style={styles.btnText}>{loading ? 'Signing in...' : 'Let\'s Go! 🚀'}</Text>
+              <Text style={styles.btnText}>{loading ? 'Signing in...' : "Let's Go! 🚀"}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.navigate('SignUp')} style={styles.link}>
@@ -98,28 +99,35 @@ export default function SignInScreen({ navigation }: Props) {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   container: { flexGrow: 1 },
-  banner: { width: '100%', height: 220 },
+  bannerWrap: {
+    borderBottomLeftRadius: 32,
+    borderBottomRightRadius: 32,
+    overflow: 'hidden',
+  },
+  banner: { width: '100%', height: 240 },
   card: {
-    flex: 1,
+    margin: spacing.md,
+    marginTop: spacing.lg,
+    backgroundColor: colors.white,
+    borderRadius: radius.xl,
     padding: spacing.xl,
-    paddingTop: spacing.lg,
+    ...shadow.md,
   },
   title: { fontSize: fontSize.xxl, fontWeight: '800', color: colors.text.primary, marginBottom: spacing.xs },
-  subtitle: { fontSize: fontSize.sm, color: colors.text.secondary, marginBottom: spacing.xl },
+  subtitle: { fontSize: fontSize.sm, color: colors.text.secondary, marginBottom: spacing.lg },
   input: {
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
+    backgroundColor: colors.background,
+    borderRadius: radius.lg,
     padding: spacing.md,
     fontSize: fontSize.md,
     color: colors.text.primary,
     marginBottom: spacing.sm,
     borderWidth: 1,
     borderColor: colors.border,
-    ...shadow.sm,
   },
   btn: {
     backgroundColor: colors.primary,
-    borderRadius: radius.md,
+    borderRadius: radius.full,
     padding: spacing.md,
     alignItems: 'center',
     marginTop: spacing.sm,

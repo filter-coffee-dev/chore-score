@@ -35,16 +35,20 @@ export default function SignUpScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <View style={styles.header}>
-            <TouchableOpacity onPress={() => navigation.goBack()}>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <View style={styles.topBar}>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
               <Text style={styles.back}>← Back</Text>
             </TouchableOpacity>
-            <Text style={styles.title}>Create Account</Text>
-            <Text style={styles.subtitle}>Time to make it official. Your chores await. 🧹</Text>
           </View>
 
-          <View style={styles.form}>
+          <View style={styles.heroSection}>
+            <Text style={styles.heroEmoji}>🧹</Text>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Time to make it official. Your chores await.</Text>
+          </View>
+
+          <View style={styles.card}>
             <Text style={styles.label}>Your name</Text>
             <TextInput
               style={styles.input}
@@ -77,7 +81,7 @@ export default function SignUpScreen({ navigation }: Props) {
             />
 
             <TouchableOpacity style={styles.btn} onPress={handleSignUp} disabled={loading}>
-              <Text style={styles.btnText}>{loading ? 'Creating account...' : 'Let\'s Do This! 💪'}</Text>
+              <Text style={styles.btnText}>{loading ? 'Creating account...' : "Let's Do This! 💪"}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => navigation.goBack()} style={styles.link}>
@@ -92,29 +96,37 @@ export default function SignUpScreen({ navigation }: Props) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  container: { flexGrow: 1 },
-  header: { padding: spacing.xl, paddingBottom: spacing.md },
-  back: { color: colors.primary, fontSize: fontSize.md, fontWeight: '600', marginBottom: spacing.md },
+  container: { flexGrow: 1, paddingBottom: spacing.xxl },
+  topBar: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
+  backBtn: { alignSelf: 'flex-start' },
+  back: { color: colors.primary, fontSize: fontSize.md, fontWeight: '600' },
+  heroSection: { alignItems: 'center', paddingVertical: spacing.lg },
+  heroEmoji: { fontSize: 48, marginBottom: spacing.sm },
   title: { fontSize: fontSize.xxl, fontWeight: '800', color: colors.text.primary, marginBottom: spacing.xs },
   subtitle: { fontSize: fontSize.sm, color: colors.text.secondary },
-  form: { padding: spacing.xl, paddingTop: 0 },
+  card: {
+    margin: spacing.md,
+    backgroundColor: colors.white,
+    borderRadius: radius.xl,
+    padding: spacing.xl,
+    ...shadow.md,
+  },
   label: { fontSize: fontSize.sm, fontWeight: '600', color: colors.text.secondary, marginBottom: spacing.xs, marginTop: spacing.sm },
   input: {
-    backgroundColor: colors.white,
-    borderRadius: radius.md,
+    backgroundColor: colors.background,
+    borderRadius: radius.lg,
     padding: spacing.md,
     fontSize: fontSize.md,
     color: colors.text.primary,
     borderWidth: 1,
     borderColor: colors.border,
-    ...shadow.sm,
   },
   btn: {
     backgroundColor: colors.primary,
-    borderRadius: radius.md,
+    borderRadius: radius.full,
     padding: spacing.md,
     alignItems: 'center',
-    marginTop: spacing.xl,
+    marginTop: spacing.lg,
     ...shadow.sm,
   },
   btnText: { color: colors.white, fontSize: fontSize.md, fontWeight: '700' },

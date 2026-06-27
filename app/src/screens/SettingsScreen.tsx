@@ -37,29 +37,27 @@ export default function SettingsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Text style={styles.title}>Settings ⚙️</Text>
       </View>
-      <ScrollView contentContainerStyle={styles.content}>
+      <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
 
         {/* Profile */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>PROFILE</Text>
-          <View style={styles.card}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{userName?.charAt(0)?.toUpperCase() ?? '?'}</Text>
-            </View>
-            <View>
-              <Text style={styles.userName}>{userName}</Text>
-              <Text style={styles.userSubtext}>That's you. Looking good. 😎</Text>
-            </View>
+        <Text style={styles.sectionLabel}>PROFILE</Text>
+        <View style={styles.card}>
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>{userName?.charAt(0)?.toUpperCase() ?? '?'}</Text>
+          </View>
+          <View>
+            <Text style={styles.userName}>{userName}</Text>
+            <Text style={styles.userSubtext}>That's you. Looking good. 😎</Text>
           </View>
         </View>
 
         {/* Household */}
         {household && (
-          <View style={styles.section}>
+          <>
             <Text style={styles.sectionLabel}>HOUSEHOLD</Text>
             <View style={styles.infoCard}>
               <View style={styles.infoRow}>
@@ -86,24 +84,22 @@ export default function SettingsScreen() {
                 </Text>
               </View>
             )}
-          </View>
+          </>
         )}
 
         {/* About */}
-        <View style={styles.section}>
-          <Text style={styles.sectionLabel}>ABOUT</Text>
-          <View style={styles.infoCard}>
-            <View style={styles.infoRow}>
-              <Text style={styles.infoLabel}>App</Text>
-              <Text style={styles.infoValue}>ChoreScore</Text>
-            </View>
-            <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
-              <Text style={styles.infoLabel}>Version</Text>
-              <Text style={styles.infoValue}>1.0.0</Text>
-            </View>
+        <Text style={styles.sectionLabel}>ABOUT</Text>
+        <View style={styles.infoCard}>
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>App</Text>
+            <Text style={styles.infoValue}>ChoreScore</Text>
           </View>
-          <Text style={styles.moto}>Make chores fun. Win together. 🏆</Text>
+          <View style={[styles.infoRow, { borderBottomWidth: 0 }]}>
+            <Text style={styles.infoLabel}>Version</Text>
+            <Text style={styles.infoValue}>1.0.0</Text>
+          </View>
         </View>
+        <Text style={styles.moto}>Make chores fun. Win together. 🏆</Text>
 
         {/* Sign out */}
         <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} disabled={signingOut}>
@@ -118,20 +114,21 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   header: {
     paddingHorizontal: spacing.md, paddingVertical: spacing.md,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-    backgroundColor: colors.white,
   },
   title: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary },
-  content: { padding: spacing.md, paddingBottom: spacing.xxl },
-  section: { marginBottom: spacing.xl },
-  sectionLabel: { fontSize: fontSize.xs, fontWeight: '700', color: colors.text.light, letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: spacing.sm },
+  content: { paddingHorizontal: spacing.md, paddingBottom: 110 },
+  sectionLabel: {
+    fontSize: fontSize.xs, fontWeight: '700', color: colors.text.light,
+    letterSpacing: 1.5, textTransform: 'uppercase',
+    marginBottom: spacing.sm, marginTop: spacing.md,
+  },
   card: {
-    backgroundColor: colors.white, borderRadius: radius.lg,
+    backgroundColor: colors.white, borderRadius: radius.xl,
     padding: spacing.md, flexDirection: 'row', alignItems: 'center',
-    ...shadow.sm,
+    ...shadow.md,
   },
   avatar: {
-    width: 48, height: 48, borderRadius: radius.full,
+    width: 52, height: 52, borderRadius: radius.full,
     backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center',
     marginRight: spacing.md,
   },
@@ -139,8 +136,8 @@ const styles = StyleSheet.create({
   userName: { fontSize: fontSize.lg, fontWeight: '700', color: colors.text.primary },
   userSubtext: { fontSize: fontSize.sm, color: colors.text.secondary },
   infoCard: {
-    backgroundColor: colors.white, borderRadius: radius.lg,
-    ...shadow.sm, overflow: 'hidden',
+    backgroundColor: colors.white, borderRadius: radius.xl,
+    ...shadow.md, overflow: 'hidden',
   },
   infoRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
@@ -151,15 +148,18 @@ const styles = StyleSheet.create({
   infoValue: { fontSize: fontSize.md, fontWeight: '600', color: colors.text.primary },
   inviteCode: { fontSize: fontSize.md, fontWeight: '700', color: colors.primary },
   waitingCard: {
-    backgroundColor: colors.highlight, borderRadius: radius.md,
+    backgroundColor: colors.highlight, borderRadius: radius.lg,
     padding: spacing.md, marginTop: spacing.sm,
   },
   waitingText: { fontSize: fontSize.sm, color: colors.text.secondary, textAlign: 'center' },
-  moto: { fontSize: fontSize.sm, color: colors.text.light, textAlign: 'center', marginTop: spacing.sm, fontStyle: 'italic' },
+  moto: {
+    fontSize: fontSize.sm, color: colors.text.light, textAlign: 'center',
+    marginTop: spacing.sm, marginBottom: spacing.xl, fontStyle: 'italic',
+  },
   signOutBtn: {
-    backgroundColor: colors.white, borderRadius: radius.lg,
+    backgroundColor: colors.white, borderRadius: radius.full,
     padding: spacing.md, alignItems: 'center',
-    borderWidth: 1, borderColor: colors.danger,
+    borderWidth: 1.5, borderColor: colors.danger,
     ...shadow.sm,
   },
   signOutText: { fontSize: fontSize.md, fontWeight: '700', color: colors.danger },

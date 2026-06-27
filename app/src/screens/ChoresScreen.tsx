@@ -101,7 +101,7 @@ export default function ChoresScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
       <View style={styles.header}>
         <Text style={styles.title}>Chores 🧹</Text>
         <TouchableOpacity style={styles.addBtn} onPress={openAdd}>
@@ -217,50 +217,57 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
     paddingHorizontal: spacing.md, paddingVertical: spacing.md,
-    borderBottomWidth: 1, borderBottomColor: colors.border,
-    backgroundColor: colors.white,
   },
   title: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary },
   addBtn: {
     backgroundColor: colors.primary, borderRadius: radius.full,
-    paddingHorizontal: spacing.md, paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
+    ...shadow.sm,
   },
   addBtnText: { color: colors.white, fontWeight: '700', fontSize: fontSize.sm },
-  content: { padding: spacing.md, paddingBottom: spacing.xxl },
+  content: { paddingHorizontal: spacing.md, paddingBottom: 110 },
   empty: { alignItems: 'center', padding: spacing.xxl },
   emptyEmoji: { fontSize: 64, marginBottom: spacing.md },
   emptyTitle: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary, marginBottom: spacing.sm },
   emptySubtext: { fontSize: fontSize.sm, color: colors.text.secondary, textAlign: 'center' },
   group: { marginBottom: spacing.lg },
-  groupTitle: { fontSize: fontSize.sm, fontWeight: '700', color: colors.text.light, textTransform: 'uppercase', letterSpacing: 1, marginBottom: spacing.sm },
+  groupTitle: {
+    fontSize: fontSize.xs, fontWeight: '700', color: colors.text.light,
+    textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: spacing.sm,
+  },
   // Modal
   modal: { flex: 1, backgroundColor: colors.background },
   modalHeader: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    padding: spacing.md, borderBottomWidth: 1, borderBottomColor: colors.border,
+    padding: spacing.md,
     backgroundColor: colors.white,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   modalTitle: { fontSize: fontSize.md, fontWeight: '700', color: colors.text.primary },
   cancel: { color: colors.text.secondary, fontSize: fontSize.md },
   save: { color: colors.primary, fontSize: fontSize.md, fontWeight: '700' },
-  modalContent: { padding: spacing.md },
-  fieldLabel: { fontSize: fontSize.sm, fontWeight: '700', color: colors.text.secondary, marginBottom: spacing.xs, marginTop: spacing.md },
+  modalContent: { padding: spacing.md, paddingBottom: spacing.xxl },
+  fieldLabel: {
+    fontSize: fontSize.sm, fontWeight: '700', color: colors.text.secondary,
+    marginBottom: spacing.xs, marginTop: spacing.md,
+  },
   input: {
-    backgroundColor: colors.white, borderRadius: radius.md,
+    backgroundColor: colors.white, borderRadius: radius.lg,
     padding: spacing.md, fontSize: fontSize.md, color: colors.text.primary,
     borderWidth: 1, borderColor: colors.border, ...shadow.sm,
   },
   emojiGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   emojiBtn: {
-    width: 48, height: 48, borderRadius: radius.sm,
+    width: 52, height: 52, borderRadius: radius.md,
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: colors.white, borderWidth: 2, borderColor: 'transparent',
   },
   emojiBtnSelected: { borderColor: colors.primary, backgroundColor: colors.highlight },
-  emojiText: { fontSize: 24 },
+  emojiText: { fontSize: 26 },
   pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   pill: {
-    borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.xs,
+    borderRadius: radius.full, paddingHorizontal: spacing.md, paddingVertical: spacing.sm,
     backgroundColor: colors.white, borderWidth: 1, borderColor: colors.border,
   },
   pillSelected: { backgroundColor: colors.primary, borderColor: colors.primary },

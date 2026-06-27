@@ -19,7 +19,6 @@ export default function HouseholdSetupScreen() {
     setLoading(true);
     try {
       const result = await api.household.create();
-      // Refresh household
       const household = await api.household.get();
       setHousehold(household);
       showAlert(
@@ -59,7 +58,9 @@ export default function HouseholdSetupScreen() {
           </Text>
 
           <TouchableOpacity style={styles.optionCard} onPress={() => setMode('create')}>
-            <Text style={styles.optionEmoji}>✨</Text>
+            <View style={styles.optionIcon}>
+              <Text style={styles.optionEmoji}>✨</Text>
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.optionTitle}>Create household</Text>
               <Text style={styles.optionDesc}>You go first. Get an invite code to share.</Text>
@@ -68,7 +69,9 @@ export default function HouseholdSetupScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.optionCard} onPress={() => setMode('join')}>
-            <Text style={styles.optionEmoji}>🔗</Text>
+            <View style={styles.optionIcon}>
+              <Text style={styles.optionEmoji}>🔗</Text>
+            </View>
             <View style={{ flex: 1 }}>
               <Text style={styles.optionTitle}>Join household</Text>
               <Text style={styles.optionDesc}>Enter the code your partner shared with you.</Text>
@@ -84,16 +87,16 @@ export default function HouseholdSetupScreen() {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.container}>
-          <TouchableOpacity onPress={() => setMode('choose')}>
+          <TouchableOpacity onPress={() => setMode('choose')} style={styles.backWrap}>
             <Text style={styles.back}>← Back</Text>
           </TouchableOpacity>
           <Text style={styles.emoji}>✨</Text>
           <Text style={styles.title}>Create your household</Text>
           <Text style={styles.subtitle}>
-            You'll get a unique invite code to share with your partner. They'll need it to join.
+            You'll get a unique invite code to share with your partner.
           </Text>
 
-          <TouchableOpacity style={[styles.btn, { backgroundColor: colors.primary }]} onPress={handleCreate} disabled={loading}>
+          <TouchableOpacity style={styles.btn} onPress={handleCreate} disabled={loading}>
             <Text style={styles.btnText}>{loading ? 'Creating...' : 'Create Household 🚀'}</Text>
           </TouchableOpacity>
         </View>
@@ -104,7 +107,7 @@ export default function HouseholdSetupScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <TouchableOpacity onPress={() => setMode('choose')}>
+        <TouchableOpacity onPress={() => setMode('choose')} style={styles.backWrap}>
           <Text style={styles.back}>← Back</Text>
         </TouchableOpacity>
         <Text style={styles.emoji}>🔗</Text>
@@ -113,18 +116,20 @@ export default function HouseholdSetupScreen() {
           Ask your partner for their invite code and enter it below.
         </Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="e.g. FROG-7842"
-          placeholderTextColor={colors.text.light}
-          value={inviteCode}
-          onChangeText={setInviteCode}
-          autoCapitalize="characters"
-          textAlign="center"
-        />
+        <View style={styles.inputCard}>
+          <TextInput
+            style={styles.input}
+            placeholder="e.g. FROG-7842"
+            placeholderTextColor={colors.text.light}
+            value={inviteCode}
+            onChangeText={setInviteCode}
+            autoCapitalize="characters"
+            textAlign="center"
+          />
+        </View>
 
-        <TouchableOpacity style={[styles.btn, { backgroundColor: colors.secondary }]} onPress={handleJoin} disabled={loading}>
-          <Text style={[styles.btnText, { color: colors.text.primary }]}>{loading ? 'Joining...' : 'Join Household 🎉'}</Text>
+        <TouchableOpacity style={[styles.btn, styles.btnSecondary]} onPress={handleJoin} disabled={loading}>
+          <Text style={[styles.btnText, styles.btnTextSecondary]}>{loading ? 'Joining...' : 'Join Household 🎉'}</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -134,26 +139,43 @@ export default function HouseholdSetupScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
   container: { flex: 1, padding: spacing.xl, justifyContent: 'center' },
-  back: { color: colors.primary, fontSize: fontSize.md, fontWeight: '600', marginBottom: spacing.xl },
+  backWrap: { marginBottom: spacing.xl },
+  back: { color: colors.primary, fontSize: fontSize.md, fontWeight: '600' },
   emoji: { fontSize: 64, textAlign: 'center', marginBottom: spacing.md },
   title: { fontSize: fontSize.xxl, fontWeight: '800', color: colors.text.primary, textAlign: 'center', marginBottom: spacing.sm },
   subtitle: { fontSize: fontSize.md, color: colors.text.secondary, textAlign: 'center', marginBottom: spacing.xl },
   optionCard: {
     backgroundColor: colors.white,
-    borderRadius: radius.lg,
+    borderRadius: radius.xl,
     padding: spacing.lg,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.md,
-    ...shadow.sm,
+    ...shadow.md,
   },
-  optionEmoji: { fontSize: 32, marginRight: spacing.md },
+  optionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: radius.lg,
+    backgroundColor: colors.background,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: spacing.md,
+  },
+  optionEmoji: { fontSize: 24 },
   optionTitle: { fontSize: fontSize.md, fontWeight: '700', color: colors.text.primary },
   optionDesc: { fontSize: fontSize.sm, color: colors.text.secondary, marginTop: 2 },
   arrow: { fontSize: fontSize.lg, color: colors.text.light },
-  input: {
+  inputCard: {
     backgroundColor: colors.white,
-    borderRadius: radius.md,
+    borderRadius: radius.xl,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+    ...shadow.sm,
+  },
+  input: {
+    backgroundColor: colors.background,
+    borderRadius: radius.lg,
     padding: spacing.md,
     fontSize: fontSize.xl,
     fontWeight: '700',
@@ -161,14 +183,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     letterSpacing: 4,
-    ...shadow.sm,
   },
   btn: {
-    borderRadius: radius.md,
+    backgroundColor: colors.primary,
+    borderRadius: radius.full,
     padding: spacing.md,
     alignItems: 'center',
-    marginTop: spacing.md,
     ...shadow.sm,
   },
+  btnSecondary: {
+    backgroundColor: colors.secondary,
+  },
   btnText: { fontSize: fontSize.md, fontWeight: '700', color: colors.white },
+  btnTextSecondary: { color: colors.text.primary },
 });
