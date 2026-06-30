@@ -11,7 +11,9 @@
       "resizeMode": "cover",
       "backgroundColor": "#e8faf4"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.chorescore.app",
@@ -37,8 +39,9 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "YOUR_EAS_PROJECT_ID"
+        "projectId": "c81c2f4d-c66f-4ea5-9ed5-38477ee70ff3"
       }
-    }
+    },
+    "owner": "filter-coffee-dev"
   }
 }

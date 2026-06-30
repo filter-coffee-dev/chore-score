@@ -6,7 +6,7 @@ import { notFound, ok, serverError } from '../shared/types';
 export const handler: APIGatewayProxyHandler = async (event) => {
   try {
     const userId = getUserId(event);
-    const limit = Math.min(Number(event.queryStringParameters?.limit ?? 50), 100);
+    const limit = Math.min(Number(event.queryStringParameters?.limit ?? 50), 500);
 
     const userResult = await docClient.send(new GetCommand({
       TableName: TABLES.USERS,
@@ -23,7 +23,9 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       Limit: limit,
     }));
 
-    return ok({ completions: result.Items ?? [], count: result.Count ?? 0 });
+    const completions = result.Items ?? [];
+    console.log('GetHistory', { householdId, limit, count: completions.length });
+    return ok({ completions, count: completions.length });
   } catch (err) {
     console.error(err);
     return serverError('Failed to get history');

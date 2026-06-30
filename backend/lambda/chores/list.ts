@@ -34,6 +34,10 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     // Annotate each chore with current-period completion status
     const choresWithStatus: ChoreWithStatus[] = chores.map((chore) => {
+      // on_demand chores are always claimable — no period restriction
+      if (chore.frequency === 'on_demand') {
+        return { ...chore, completedThisPeriod: false };
+      }
       const periodBegin = periodStart(chore.frequency);
       const periodCompletion = completions.find(
         (c) => c.choreId === chore.choreId && c.completedAt >= periodBegin

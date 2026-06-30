@@ -197,6 +197,7 @@ export class ChoreScoreStack extends cdk.Stack {
     choresTable.grantReadData(completeChoreFn);
     completionsTable.grantReadWriteData(completeChoreFn);
     usersTable.grantReadData(completeChoreFn);
+    householdsTable.grantReadData(completeChoreFn);
     // Allow sending push notifications via Pinpoint
     // Pinpoint push permission added manually after activating Pinpoint in AWS console
 

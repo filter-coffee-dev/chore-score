@@ -72,7 +72,7 @@ export interface Chore {
   name: string;
   emoji: string;
   weight: number;
-  frequency: 'daily' | 'weekly' | 'monthly';
+  frequency: 'daily' | 'weekly' | 'monthly' | 'on_demand';
   createdAt: string;
   createdBy: string;
 }

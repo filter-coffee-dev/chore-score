@@ -27,7 +27,7 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       updates.push('#w = :weight'); values[':weight'] = Number(weight);
     }
     if (frequency) {
-      if (!['daily', 'weekly', 'monthly'].includes(frequency)) return badRequest('Invalid frequency');
+      if (!['daily', 'weekly', 'monthly', 'on_demand'].includes(frequency)) return badRequest('Invalid frequency');
       updates.push('frequency = :freq'); values[':freq'] = frequency;
     }
     if (updates.length === 0) return badRequest('Nothing to update');

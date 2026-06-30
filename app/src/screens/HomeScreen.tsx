@@ -1,8 +1,9 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  RefreshControl, Image,
+  RefreshControl, Animated, Image, Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { showAlert } from '../utils/alert';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -10,14 +11,87 @@ import { api } from '../services/api';
 import { useStore } from '../store/useStore';
 import { ScoreCard } from '../components/ScoreCard';
 import { TauntBanner } from '../components/TauntBanner';
-import { StreakBadge } from '../components/StreakBadge';
 import { ChoreItem } from '../components/ChoreItem';
-import { colors, spacing, fontSize, radius, shadow } from '../theme';
+import { colors, fonts, spacing, radius, shadow } from '../theme';
+
+const SCREEN_W = Dimensions.get('window').width;
+const SLIDE_H = 210;
+
+const SLIDES = [
+  require('../../assets/slide2-cooking.png'),
+  require('../../assets/slide2-repairs.png'),
+  require('../../assets/slide2-cleaning.png'),
+  require('../../assets/slide2-dropoff.png'),
+  require('../../assets/slide2-bathroom.png'),
+  require('../../assets/slide2-laundry.png'),
+  require('../../assets/slide2-roadtrip.png'),
+];
+
+function isoWeek(): number {
+  const d = new Date();
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay() || 7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+}
+
+function ChoreSlideshow() {
+  const [active, setActive] = useState(0);
+  const translateX = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setActive((prev) => {
+        const next = (prev + 1) % SLIDES.length;
+        Animated.timing(translateX, {
+          toValue: -next * SCREEN_W,
+          duration: 500,
+          useNativeDriver: true,
+        }).start();
+        return next;
+      });
+    }, 3200);
+    return () => clearInterval(t);
+  }, [translateX]);
+
+  return (
+    <View style={styles.slideshow}>
+      <Animated.View style={[styles.slideTrack, { transform: [{ translateX }] }]}>
+        {SLIDES.map((src, i) => (
+          <Image
+            key={i}
+            source={src}
+            style={styles.slide}
+            resizeMode="cover"
+          />
+        ))}
+      </Animated.View>
+
+      {/* Top scrim */}
+      <LinearGradient
+        colors={['rgba(0,0,0,0.38)', 'rgba(0,0,0,0)']}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 0, y: 1 }}
+        style={styles.scrim}
+        pointerEvents="none"
+      />
+
+      {/* Dots */}
+      <View style={styles.dotsRow} pointerEvents="none">
+        {SLIDES.map((_, i) => (
+          <View key={i} style={[styles.dot, i === active && styles.dotActive]} />
+        ))}
+      </View>
+    </View>
+  );
+}
 
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [completing, setCompleting] = useState<string | null>(null);
   const { scores, streak, taunt, chores, userId, userName, setScores, setChores } = useStore();
+
+  const starSpin = useRef(new Animated.Value(0)).current;
 
   const load = useCallback(async () => {
     try {
@@ -32,7 +106,14 @@ export default function HomeScreen() {
     }
   }, [setScores, setChores]);
 
-  useFocusEffect(useCallback(() => { load(); }, [load]));
+  useFocusEffect(useCallback(() => {
+    load();
+    Animated.timing(starSpin, {
+      toValue: 1,
+      duration: 400,
+      useNativeDriver: true,
+    }).start(() => starSpin.setValue(0));
+  }, [load]));
 
   async function onRefresh() {
     setRefreshing(true);
@@ -55,72 +136,81 @@ export default function HomeScreen() {
 
   const myScore = scores.find((s) => s.userId === userId);
   const partnerScore = scores.find((s) => s.userId !== userId);
-  const myPoints = myScore?.totalPoints ?? 0;
-  const partnerPoints = partnerScore?.totalPoints ?? 0;
-  const imLeading = myPoints >= partnerPoints;
 
-  const todayChores = chores.filter((c) => c.frequency === 'daily' || !c.completedThisPeriod);
-  const pendingCount = todayChores.filter((c) => !c.completedThisPeriod).length;
+  const unclaimed = chores.filter((c) => !c.completedThisPeriod);
+
+  const spin = starSpin.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '360deg'],
+  });
+
+  const firstName = userName?.split(' ')[0] ?? 'there';
 
   return (
-    <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+    <SafeAreaView style={styles.safe} edges={['left', 'right']}>
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles.scroll}
       >
-        {/* Hero banner with rounded bottom */}
-        <View style={styles.bannerWrap}>
-          <Image source={require('../../assets/Banner-Family.png')} style={styles.banner} resizeMode="cover" />
-          <View style={styles.bannerOverlay}>
-            <Text style={styles.greeting}>Hey {userName?.split(' ')[0]}! 👋</Text>
-            <TouchableOpacity onPress={onRefresh} style={styles.refreshBtn}>
-              <Text style={styles.refreshIcon}>🔄</Text>
-            </TouchableOpacity>
+        {/* Full-bleed slideshow */}
+        <ChoreSlideshow />
+
+        {/* Score card */}
+        <View style={styles.scoresCard}>
+          {/* Card header row */}
+          <View style={styles.cardHeader}>
+            <View>
+              <Text style={styles.weekLabel}>WEEK {isoWeek()}</Text>
+              <Text style={styles.headerTitle}>It's On.</Text>
+            </View>
+            {streak > 0 && (
+              <View style={styles.streakPill}>
+                <Text style={styles.streakPillText}>🔥 {streak} days</Text>
+              </View>
+            )}
           </View>
+
+          {/* Scores */}
+          {scores.length > 0 ? (
+            <View style={styles.scoresRow}>
+              {myScore && <ScoreCard score={myScore} isMe={true} mascot="guy" />}
+              <View style={styles.vsWrap}>
+                <Animated.Text style={[styles.vsStar, { transform: [{ rotate: spin }] }]}>★</Animated.Text>
+                <Text style={styles.vsText}>VS</Text>
+              </View>
+              {partnerScore && <ScoreCard score={partnerScore} isMe={false} mascot="girl" />}
+            </View>
+          ) : (
+            <View style={styles.emptyScores}>
+              <Text style={styles.emptyText}>Hey {firstName}! Complete a chore to get on the board 🏆</Text>
+            </View>
+          )}
         </View>
-
-        {/* Score Cards */}
-        {scores.length > 0 && (
-          <View style={styles.scoresRow}>
-            {myScore && <ScoreCard score={myScore} isMe={true} isLeading={imLeading} />}
-            {partnerScore && <ScoreCard score={partnerScore} isMe={false} isLeading={!imLeading} />}
-          </View>
-        )}
-        {scores.length === 0 && (
-          <View style={styles.emptyScores}>
-            <Text style={styles.emptyText}>No scores yet. Complete a chore to get on the board! 🏆</Text>
-          </View>
-        )}
-
-        {/* Streak */}
-        <StreakBadge streak={streak} />
 
         {/* Taunt */}
         {taunt ? <TauntBanner taunt={taunt} /> : null}
 
-        {/* Today's Chores */}
+        {/* Up for grabs */}
         <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Today's Chores</Text>
-            {pendingCount > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{pendingCount} left</Text>
-              </View>
-            )}
-            {pendingCount === 0 && chores.length > 0 && (
-              <Text style={styles.allDone}>All done! 🎉</Text>
-            )}
+          <View style={styles.sectionRow}>
+            <Text style={styles.sectionTitle}>Up for grabs</Text>
           </View>
 
-          {todayChores.length === 0 ? (
+          {chores.length === 0 ? (
             <View style={styles.emptyChores}>
-              <Text style={styles.emptyEmoji}>🧹</Text>
+              <Text style={styles.emptyChoreEmoji}>🌿</Text>
               <Text style={styles.emptyTitle}>No chores set up yet.</Text>
-              <Text style={styles.emptySubtext}>Go to Chores tab to add some. Yes, now.</Text>
+              <Text style={styles.emptySub}>Go to Chores tab to add some.</Text>
+            </View>
+          ) : unclaimed.length === 0 ? (
+            <View style={styles.emptyChores}>
+              <Text style={styles.emptyChoreEmoji}>🎉</Text>
+              <Text style={styles.emptyTitle}>All done!</Text>
+              <Text style={styles.emptySub}>You crushed it today.</Text>
             </View>
           ) : (
-            todayChores.map((chore) => (
+            unclaimed.map((chore) => (
               <ChoreItem
                 key={chore.choreId}
                 chore={chore}
@@ -137,70 +227,159 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  scrollContent: { paddingBottom: 110 },
-  bannerWrap: {
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
+  scroll: { paddingBottom: spacing.lg },
+
+  // Slideshow
+  slideshow: {
+    height: SLIDE_H,
     overflow: 'hidden',
-    marginBottom: spacing.md,
+    backgroundColor: '#EEF5E6',
   },
-  banner: { width: '100%', height: 220 },
-  bannerOverlay: {
+  slideTrack: {
+    flexDirection: 'row',
+    width: SCREEN_W * SLIDES.length,
+    height: SLIDE_H,
+  },
+  slide: {
+    width: SCREEN_W,
+    height: SLIDE_H,
+  },
+  scrim: {
     position: 'absolute',
-    bottom: 0,
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 70,
+  },
+  dotsRow: {
+    position: 'absolute',
+    bottom: 10,
     left: 0,
     right: 0,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    backgroundColor: 'rgba(26,58,46,0.35)',
+    gap: 5,
   },
-  greeting: { fontSize: fontSize.lg, fontWeight: '800', color: colors.white },
-  refreshBtn: {
-    backgroundColor: 'rgba(255,255,255,0.25)',
+  dot: {
+    width: 6,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: 'rgba(255,255,255,0.53)',
+  },
+  dotActive: {
+    width: 18,
+    height: 6,
+    borderRadius: 3,
+    backgroundColor: colors.white,
+  },
+
+  // Score card
+  scoresCard: {
+    marginHorizontal: 16,
+    marginTop: 10,
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    paddingTop: 10,
+    paddingHorizontal: 14,
+    paddingBottom: 12,
+    ...shadow.md,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingBottom: 8,
+    marginBottom: 6,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E8F0E4',
+  },
+  weekLabel: {
+    fontSize: 10,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#9EBBA4',
+    letterSpacing: 0.5,
+  },
+  headerTitle: {
+    fontSize: 17,
+    fontFamily: fonts.headingBold,
+    color: '#16463A',
+    lineHeight: 20,
+    marginTop: 1,
+  },
+  streakPill: {
+    backgroundColor: '#EEF5E6',
     borderRadius: radius.full,
-    padding: spacing.sm,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
   },
-  refreshIcon: { fontSize: 16 },
+  streakPillText: {
+    fontSize: 10,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#15795C',
+  },
   scoresRow: {
     flexDirection: 'row',
-    paddingHorizontal: spacing.md,
-    marginBottom: spacing.sm,
+    alignItems: 'center',
+  },
+  vsWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: spacing.xs,
+  },
+  vsStar: {
+    fontSize: 34,
+    color: colors.limeLight,
+    lineHeight: 36,
+  },
+  vsText: {
+    fontSize: 11,
+    fontFamily: fonts.headingBold,
+    color: colors.muted,
   },
   emptyScores: {
-    margin: spacing.md,
     padding: spacing.lg,
-    backgroundColor: colors.white,
-    borderRadius: radius.xl,
     alignItems: 'center',
-    ...shadow.sm,
   },
-  section: { paddingHorizontal: spacing.md, paddingTop: spacing.sm },
-  sectionHeader: {
+  emptyText: {
+    fontSize: 14,
+    fontFamily: fonts.bodyBold,
+    color: colors.mid,
+    textAlign: 'center',
+  },
+
+  // Sections
+  section: { paddingHorizontal: 16, paddingTop: spacing.sm },
+  sectionRow: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.md,
   },
-  sectionTitle: { fontSize: fontSize.lg, fontWeight: '800', color: colors.text.primary, flex: 1 },
-  badge: {
-    backgroundColor: colors.accent,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: fonts.headingBold,
+    color: colors.ink,
+    flex: 1,
   },
-  badgeText: { fontSize: fontSize.xs, fontWeight: '700', color: colors.text.primary },
-  allDone: { fontSize: fontSize.sm, fontWeight: '700', color: colors.primary },
   emptyChores: {
     alignItems: 'center',
-    padding: spacing.xl,
+    paddingVertical: spacing.xl,
     backgroundColor: colors.white,
     borderRadius: radius.xl,
     ...shadow.sm,
   },
-  emptyEmoji: { fontSize: 48, marginBottom: spacing.sm },
-  emptyTitle: { fontSize: fontSize.md, fontWeight: '700', color: colors.text.primary, textAlign: 'center' },
-  emptySubtext: { fontSize: fontSize.sm, color: colors.text.secondary, textAlign: 'center', marginTop: spacing.xs },
-  emptyText: { fontSize: fontSize.md, fontWeight: '600', color: colors.text.secondary, textAlign: 'center' },
+  emptyChoreEmoji: { fontSize: 48, marginBottom: spacing.sm },
+  emptyTitle: {
+    fontSize: 15,
+    fontFamily: fonts.bodyExtraBold,
+    color: colors.ink,
+    marginBottom: 4,
+  },
+  emptySub: {
+    fontSize: 13,
+    fontFamily: fonts.bodyBold,
+    color: colors.mid,
+  },
 });

@@ -11,8 +11,8 @@ export const handler: APIGatewayProxyHandler = async (event) => {
 
     if (!name || !weight || !frequency) return badRequest('name, weight, and frequency are required');
     if (weight < 1 || weight > 5) return badRequest('weight must be between 1 and 5');
-    if (!['daily', 'weekly', 'monthly'].includes(frequency)) {
-      return badRequest('frequency must be daily, weekly, or monthly');
+    if (!['daily', 'weekly', 'monthly', 'on_demand'].includes(frequency)) {
+      return badRequest('frequency must be daily, weekly, monthly, or on_demand');
     }
 
     const userResult = await docClient.send(new GetCommand({
