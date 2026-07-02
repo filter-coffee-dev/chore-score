@@ -23,6 +23,7 @@
     },
     "android": {
       "package": "com.chorescore.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#53a687"

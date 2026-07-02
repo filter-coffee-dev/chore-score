@@ -16,6 +16,10 @@ interface AppState {
   userName: string | null;
   setUser: (id: string | null, name: string | null) => void;
 
+  // Avatar
+  myAvatar: 'guy' | 'girl';
+  setMyAvatar: (avatar: 'guy' | 'girl') => void;
+
   // Household
   household: Household | null;
   setHousehold: (h: Household | null) => void;
@@ -48,6 +52,9 @@ export const useStore = create<AppState>((set) => ({
   userName: null,
   setUser: (userId, userName) => set({ userId, userName }),
 
+  myAvatar: 'guy',
+  setMyAvatar: (myAvatar) => set({ myAvatar }),
+
   household: null,
   setHousehold: (household) => set({ household }),
 
@@ -67,7 +74,7 @@ export const useStore = create<AppState>((set) => ({
   setBadges: (memberBadges, allBadges) => set({ memberBadges, allBadges }),
 
   reset: () => set({
-    userId: null, userName: null, household: null, chores: [],
+    userId: null, userName: null, myAvatar: 'guy', household: null, chores: [],
     scores: [], streak: 0, taunt: '', completions: [], memberBadges: [], allBadges: [],
   }),
 }));

@@ -4,6 +4,12 @@ import React, { useEffect, useState } from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { useFonts } from 'expo-font';
+import { Baloo2_700Bold, Baloo2_800ExtraBold } from '@expo-google-fonts/baloo-2';
+import {
+  Nunito_400Regular, Nunito_600SemiBold, Nunito_700Bold,
+  Nunito_800ExtraBold, Nunito_900Black,
+} from '@expo-google-fonts/nunito';
 import { AppNavigator } from './src/navigation';
 import { isAuthenticated, getCurrentUserId, getCurrentUserName } from './src/services/auth';
 import { setupNotificationHandler, registerPushToken } from './src/services/notifications';
@@ -14,9 +20,17 @@ import { colors } from './src/theme';
 setupNotificationHandler();
 
 export default function App() {
-  const [loading, setLoading] = useState(true);
-  // Derive nav flags from the store so any screen's setUser/setHousehold
-  // call instantly re-routes without needing to pass callbacks up.
+  const [appReady, setAppReady] = useState(false);
+  const [fontsLoaded] = useFonts({
+    Baloo2_700Bold,
+    Baloo2_800ExtraBold,
+    Nunito_400Regular,
+    Nunito_600SemiBold,
+    Nunito_700Bold,
+    Nunito_800ExtraBold,
+    Nunito_900Black,
+  });
+
   const { setUser, setHousehold, userId, household } = useStore();
   const isLoggedIn = userId !== null;
   const hasHousehold = household !== null;
@@ -36,17 +50,17 @@ export default function App() {
           setHousehold(h);
           await registerPushToken((token) => api.users.updateMe({ deviceToken: token }));
         } catch {
-          // No household yet — store stays null, navigator shows HouseholdSetup
+          // No household yet
         }
       }
     } catch {
-      // Not authenticated — store stays empty, navigator shows SignIn
+      // Not authenticated
     } finally {
-      setLoading(false);
+      setAppReady(true);
     }
   }
 
-  if (loading) {
+  if (!appReady || !fontsLoaded) {
     return (
       <View style={styles.loader}>
         <ActivityIndicator size="large" color={colors.primary} />

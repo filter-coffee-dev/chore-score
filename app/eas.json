@@ -4,11 +4,23 @@
   },
   "build": {
     "preview": {
+      "env": {
+        "EXPO_PUBLIC_AWS_REGION": "us-east-1",
+        "EXPO_PUBLIC_COGNITO_USER_POOL_ID": "us-east-1_0AI9l90yS",
+        "EXPO_PUBLIC_COGNITO_CLIENT_ID": "5mdvu3gr0dr69o99q1g73l5m82",
+        "EXPO_PUBLIC_API_URL": "https://je5velhsib.execute-api.us-east-1.amazonaws.com/prod"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
+      "env": {
+        "EXPO_PUBLIC_AWS_REGION": "us-east-1",
+        "EXPO_PUBLIC_COGNITO_USER_POOL_ID": "us-east-1_0AI9l90yS",
+        "EXPO_PUBLIC_COGNITO_CLIENT_ID": "5mdvu3gr0dr69o99q1g73l5m82",
+        "EXPO_PUBLIC_API_URL": "https://je5velhsib.execute-api.us-east-1.amazonaws.com/prod"
+      },
       "android": {
         "buildType": "app-bundle"
       },

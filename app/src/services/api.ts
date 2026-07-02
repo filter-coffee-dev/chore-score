@@ -53,6 +53,9 @@ export const api = {
 
   history: {
     get: (limit = 50) => get<{ completions: Completion[]; count: number }>(`/history?limit=${limit}`),
+    delete: (completionId: string) => del<{ deleted: boolean }>(`/history/${encodeURIComponent(completionId)}`),
+    update: (completionId: string, data: { pointsEarned: number }) =>
+      put<{ updated: boolean }>(`/history/${encodeURIComponent(completionId)}`, data),
   },
 
   badges: {
@@ -60,7 +63,8 @@ export const api = {
   },
 
   users: {
-    updateMe: (data: { name?: string; deviceToken?: string }) => put<{ updated: boolean }>('/users/me', data),
+    updateMe: (data: { name?: string; deviceToken?: string; avatar?: 'guy' | 'girl' }) =>
+      put<{ updated: boolean }>('/users/me', data),
   },
 };
 
@@ -99,6 +103,7 @@ export interface Score {
   userName: string;
   totalPoints: number;
   totalCompletions: number;
+  avatar?: 'guy' | 'girl';
 }
 
 export interface Badge {

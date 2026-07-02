@@ -69,11 +69,18 @@ export const handler: APIGatewayProxyHandler = async (event) => {
       { id: household.member1Id as string, name: household.member1Name as string },
       ...(household.member2Id ? [{ id: household.member2Id as string, name: household.member2Name as string }] : []),
     ];
-    const scores = members.map((m) => ({
+
+    // Fetch each member's avatar from Users table
+    const memberUserResults = await Promise.all(
+      members.map((m) => docClient.send(new GetCommand({ TableName: TABLES.USERS, Key: { userId: m.id } })))
+    );
+
+    const scores = members.map((m, i) => ({
       userId: m.id,
       userName: m.name,
       totalPoints: scoreMap[m.id]?.points ?? 0,
       totalCompletions: scoreMap[m.id]?.count ?? 0,
+      avatar: (memberUserResults[i].Item?.avatar ?? 'guy') as 'guy' | 'girl',
     }));
 
     const memberIds = members.map((m) => m.id);

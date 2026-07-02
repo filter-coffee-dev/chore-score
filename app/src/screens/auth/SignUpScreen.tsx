@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  KeyboardAvoidingView, Platform, ScrollView,
+  KeyboardAvoidingView, Platform, ScrollView, Image, Dimensions,
 } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { showAlert } from '../../utils/alert';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { AuthStackParams } from '../../navigation';
 import { signUp } from '../../services/auth';
-import { colors, spacing, radius, fontSize, shadow } from '../../theme';
+import { colors, fonts, spacing, shadow } from '../../theme';
 
 type Props = { navigation: StackNavigationProp<AuthStackParams, 'SignUp'> };
+
+// create-account-hero2.png: 941×1672 portrait — same top-crop pattern as login-hero
+const SCREEN_W = Dimensions.get('window').width;
+const CA_HERO_NATURAL_H = Math.round(SCREEN_W * 1672 / 941);
+const CA_HERO_CROP_H = 310;
 
 export default function SignUpScreen({ navigation }: Props) {
   const [name, setName] = useState('');
@@ -33,27 +39,54 @@ export default function SignUpScreen({ navigation }: Props) {
   }
 
   return (
-    <SafeAreaView style={styles.safe}>
+    <View style={styles.root}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-          <View style={styles.topBar}>
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-              <Text style={styles.back}>← Back</Text>
-            </TouchableOpacity>
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          {/* Hero image — top-cropped 270px */}
+          <View style={styles.heroWrap}>
+            <Image
+              source={require('../../../assets/create-account-hero2.png')}
+              style={styles.heroImage}
+              resizeMode="stretch"
+            />
+
+            {/* Frosted pill back button overlaid on hero */}
+            <SafeAreaView edges={['top']} style={styles.heroOverlay} pointerEvents="box-none">
+              <TouchableOpacity
+                onPress={() => navigation.goBack()}
+                style={[styles.backBtn, { backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' } as any]}
+              >
+                <Text style={styles.backText}>
+                  <Text style={styles.backArrow}>{'← '}</Text>Back
+                </Text>
+              </TouchableOpacity>
+            </SafeAreaView>
+
+            {/* Fade: transparent → mint */}
+            <LinearGradient
+              colors={['#C8E8CE00', '#C8E8CE']}
+              style={styles.heroFade}
+              pointerEvents="none"
+            />
           </View>
 
-          <View style={styles.heroSection}>
-            <Text style={styles.heroEmoji}>🧹</Text>
+          {/* Title section: mint band */}
+          <View style={styles.titleSection}>
             <Text style={styles.title}>Create Account</Text>
             <Text style={styles.subtitle}>Time to make it official. Your chores await.</Text>
           </View>
 
+          {/* Form card */}
           <View style={styles.card}>
             <Text style={styles.label}>Your name</Text>
             <TextInput
               style={styles.input}
               placeholder="What should we call you?"
-              placeholderTextColor={colors.text.light}
+              placeholderTextColor="#9EBBA4"
               value={name}
               onChangeText={setName}
               autoCapitalize="words"
@@ -63,7 +96,7 @@ export default function SignUpScreen({ navigation }: Props) {
             <TextInput
               style={styles.input}
               placeholder="you@example.com"
-              placeholderTextColor={colors.text.light}
+              placeholderTextColor="#9EBBA4"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -74,62 +107,158 @@ export default function SignUpScreen({ navigation }: Props) {
             <TextInput
               style={styles.input}
               placeholder="8+ characters"
-              placeholderTextColor={colors.text.light}
+              placeholderTextColor="#9EBBA4"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
             />
 
-            <TouchableOpacity style={styles.btn} onPress={handleSignUp} disabled={loading}>
-              <Text style={styles.btnText}>{loading ? 'Creating account...' : "Let's Do This! 💪"}</Text>
+            <TouchableOpacity onPress={handleSignUp} disabled={loading} style={styles.btnWrap}>
+              <LinearGradient
+                colors={['#27A07C', '#15795C']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 0, y: 1 }}
+                style={styles.btn}
+              >
+                <Text style={styles.btnText}>
+                  {loading ? 'Creating account…' : "Let's Do This! 💪"}
+                </Text>
+              </LinearGradient>
             </TouchableOpacity>
 
-            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.link}>
-              <Text style={styles.linkText}>Already have an account? Sign in →</Text>
+            <TouchableOpacity onPress={() => navigation.goBack()} style={styles.linkWrap}>
+              <Text style={styles.linkText}>
+                Already have an account?{' '}
+                <Text style={styles.linkAccent}>Sign in</Text>
+              </Text>
             </TouchableOpacity>
           </View>
+
+          <View style={{ height: spacing.xl }} />
         </ScrollView>
       </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
-  container: { flexGrow: 1, paddingBottom: spacing.xxl },
-  topBar: { paddingHorizontal: spacing.lg, paddingTop: spacing.md },
-  backBtn: { alignSelf: 'flex-start' },
-  back: { color: colors.primary, fontSize: fontSize.md, fontWeight: '600' },
-  heroSection: { alignItems: 'center', paddingVertical: spacing.lg },
-  heroEmoji: { fontSize: 48, marginBottom: spacing.sm },
-  title: { fontSize: fontSize.xxl, fontWeight: '800', color: colors.text.primary, marginBottom: spacing.xs },
-  subtitle: { fontSize: fontSize.sm, color: colors.text.secondary },
-  card: {
-    margin: spacing.md,
-    backgroundColor: colors.white,
-    borderRadius: radius.xl,
-    padding: spacing.xl,
-    ...shadow.md,
+  root: { flex: 1, backgroundColor: '#C8E8CE' },
+  scroll: { flexGrow: 1 },
+
+  // Hero
+  heroWrap: {
+    height: CA_HERO_CROP_H,
+    overflow: 'hidden',
+    backgroundColor: '#EEF5E6',
   },
-  label: { fontSize: fontSize.sm, fontWeight: '600', color: colors.text.secondary, marginBottom: spacing.xs, marginTop: spacing.sm },
-  input: {
-    backgroundColor: colors.background,
-    borderRadius: radius.lg,
-    padding: spacing.md,
-    fontSize: fontSize.md,
-    color: colors.text.primary,
-    borderWidth: 1,
-    borderColor: colors.border,
+  heroImage: {
+    width: '100%',
+    height: CA_HERO_NATURAL_H,
   },
-  btn: {
-    backgroundColor: colors.primary,
-    borderRadius: radius.full,
-    padding: spacing.md,
+  heroOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+  },
+  backBtn: {
+    alignSelf: 'flex-start',
+    marginHorizontal: spacing.lg,
+    marginTop: spacing.sm,
+    backgroundColor: 'rgba(255,255,255,0.4)',
+    borderRadius: 999,
+    paddingTop: 6,
+    paddingBottom: 6,
+    paddingLeft: 10,
+    paddingRight: 14,
+  },
+  backArrow: {
+    fontSize: 16,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#15795C',
+    lineHeight: 20,
+  },
+  backText: {
+    fontSize: 13,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#15795C',
+  },
+  heroFade: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 80,
+  },
+
+  // Title section
+  titleSection: {
+    backgroundColor: '#C8E8CE',
+    paddingHorizontal: 22,
+    paddingVertical: 8,
     alignItems: 'center',
-    marginTop: spacing.lg,
-    ...shadow.sm,
   },
-  btnText: { color: colors.white, fontSize: fontSize.md, fontWeight: '700' },
-  link: { alignItems: 'center', marginTop: spacing.lg },
-  linkText: { color: colors.primary, fontSize: fontSize.sm, fontWeight: '600' },
+  title: {
+    fontSize: 24,
+    fontFamily: fonts.headingBold,
+    color: '#16463A',
+    marginBottom: 2,
+  },
+  subtitle: {
+    fontSize: 12,
+    fontFamily: fonts.bodyBold,
+    color: '#4E7C5F',
+    textAlign: 'center',
+  },
+
+  // Card
+  card: {
+    margin: 8,
+    marginHorizontal: 18,
+    backgroundColor: '#ffffff',
+    borderRadius: 24,
+    padding: 14,
+    paddingHorizontal: 16,
+    shadowColor: 'rgba(20,70,56,0.25)',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 1,
+    shadowRadius: 24,
+    elevation: 4,
+  },
+  label: {
+    fontSize: 12,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#16463A',
+    marginBottom: 4,
+    marginTop: spacing.sm,
+  },
+  input: {
+    backgroundColor: '#EEF5E6',
+    borderRadius: 999,
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    fontSize: 13,
+    fontFamily: fonts.bodyBold,
+    color: '#16463A',
+  },
+  btnWrap: { marginTop: 4 },
+  btn: {
+    borderRadius: 999,
+    paddingVertical: 15,
+    alignItems: 'center',
+    shadowColor: '#15795C',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.53,
+    shadowRadius: 16,
+    elevation: 8,
+  },
+  btnText: {
+    fontSize: 16,
+    fontFamily: fonts.headingBold,
+    color: '#ffffff',
+    letterSpacing: 0.3,
+  },
+  linkWrap: { alignItems: 'center', paddingVertical: spacing.sm, marginTop: 4 },
+  linkText: { fontSize: 13, fontFamily: fonts.bodyBold, color: '#4E7C5F' },
+  linkAccent: { fontFamily: fonts.bodyExtraBold, color: '#EE8C3C' },
 });

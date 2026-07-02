@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  RefreshControl, Animated, Image, Dimensions,
+  RefreshControl, Animated, Image, Dimensions, PanResponder,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { showAlert } from '../utils/alert';
@@ -25,6 +25,9 @@ const SLIDES = [
   require('../../assets/slide2-bathroom.png'),
   require('../../assets/slide2-laundry.png'),
   require('../../assets/slide2-roadtrip.png'),
+  require('../../assets/slide2-p1.png'),
+  require('../../assets/slide2-p2.png'),
+  require('../../assets/slide2-p3.png'),
 ];
 
 function isoWeek(): number {
@@ -37,25 +40,61 @@ function isoWeek(): number {
 
 function ChoreSlideshow() {
   const [active, setActive] = useState(0);
+  const activeRef = useRef(0);
   const translateX = useRef(new Animated.Value(0)).current;
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
+      onMoveShouldSetPanResponder: (_, gs) =>
+        Math.abs(gs.dx) > Math.abs(gs.dy) * 1.5 && Math.abs(gs.dx) > 8,
+      onPanResponderMove: (_, gs) => {
+        translateX.setValue(-activeRef.current * SCREEN_W + gs.dx);
+      },
+      onPanResponderRelease: (_, gs) => {
+        const threshold = SCREEN_W * 0.25;
+        let next = activeRef.current;
+        if (gs.dx < -threshold && next < SLIDES.length - 1) next++;
+        else if (gs.dx > threshold && next > 0) next--;
+        activeRef.current = next;
+        setActive(next);
+        Animated.timing(translateX, {
+          toValue: -next * SCREEN_W,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      },
+      onPanResponderTerminate: () => {
+        Animated.spring(translateX, {
+          toValue: -activeRef.current * SCREEN_W,
+          useNativeDriver: true,
+        }).start();
+      },
+    })
+  ).current;
 
   useEffect(() => {
     const t = setInterval(() => {
-      setActive((prev) => {
-        const next = (prev + 1) % SLIDES.length;
+      const next = activeRef.current + 1;
+      if (next >= SLIDES.length) {
+        translateX.setValue(0);
+        activeRef.current = 0;
+        setActive(0);
+      } else {
+        activeRef.current = next;
+        setActive(next);
         Animated.timing(translateX, {
           toValue: -next * SCREEN_W,
           duration: 500,
           useNativeDriver: true,
         }).start();
-        return next;
-      });
-    }, 3200);
+      }
+    }, 15000);
     return () => clearInterval(t);
   }, [translateX]);
 
   return (
-    <View style={styles.slideshow}>
+    <View style={styles.slideshow} {...panResponder.panHandlers}>
       <Animated.View style={[styles.slideTrack, { transform: [{ translateX }] }]}>
         {SLIDES.map((src, i) => (
           <Image
@@ -174,12 +213,12 @@ export default function HomeScreen() {
           {/* Scores */}
           {scores.length > 0 ? (
             <View style={styles.scoresRow}>
-              {myScore && <ScoreCard score={myScore} isMe={true} mascot="guy" />}
+              {myScore && <ScoreCard score={myScore} isMe={true} mascot={myScore.avatar ?? 'guy'} />}
               <View style={styles.vsWrap}>
                 <Animated.Text style={[styles.vsStar, { transform: [{ rotate: spin }] }]}>★</Animated.Text>
                 <Text style={styles.vsText}>VS</Text>
               </View>
-              {partnerScore && <ScoreCard score={partnerScore} isMe={false} mascot="girl" />}
+              {partnerScore && <ScoreCard score={partnerScore} isMe={false} mascot={partnerScore.avatar ?? 'girl'} />}
             </View>
           ) : (
             <View style={styles.emptyScores}>

@@ -1,24 +1,46 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet } from 'react-native';
 import { Score } from '../services/api';
-import { colors, radius, spacing, fontSize, shadow } from '../theme';
+import { colors, fonts, radius, spacing, shadow } from '../theme';
+
+const GUY = require('../../assets/score-guy.png');
+const GIRL = require('../../assets/score-girl.png');
 
 interface Props {
   score: Score;
   isMe: boolean;
-  isLeading: boolean;
+  mascot?: 'guy' | 'girl';
 }
 
-export function ScoreCard({ score, isMe, isLeading }: Props) {
+export function ScoreCard({ score, isMe, mascot = 'guy' }: Props) {
+  const displayName = isMe ? 'You' : score.userName.split(' ')[0];
+  const target = score.totalPoints;
+  const [displayed, setDisplayed] = useState(0);
+
+  useEffect(() => {
+    let start: number | null = null;
+    const duration = 600;
+    function step(ts: number) {
+      if (!start) start = ts;
+      const progress = Math.min((ts - start) / duration, 1);
+      setDisplayed(Math.round(progress * target));
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    const handle = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(handle);
+  }, [target]);
+
   return (
-    <View style={[styles.card, isLeading && styles.leading, isMe && styles.mine]}>
-      {isLeading && <Text style={styles.crown}>👑</Text>}
-      <Text style={styles.name} numberOfLines={1}>
-        {isMe ? 'You' : score.userName}
+    <View style={styles.card}>
+      <Image
+        source={mascot === 'girl' ? GIRL : GUY}
+        style={styles.mascot}
+        resizeMode="contain"
+      />
+      <Text style={styles.name} numberOfLines={1}>{displayName}</Text>
+      <Text style={[styles.score, isMe ? styles.scoreMe : styles.scorePartner]}>
+        {displayed}
       </Text>
-      <Text style={[styles.points, isLeading && styles.pointsLeading]}>{score.totalPoints}</Text>
-      <Text style={styles.label}>pts</Text>
-      <Text style={styles.completions}>{score.totalCompletions} chores done</Text>
     </View>
   );
 }
@@ -26,51 +48,29 @@ export function ScoreCard({ score, isMe, isLeading }: Props) {
 const styles = StyleSheet.create({
   card: {
     flex: 1,
-    backgroundColor: colors.white,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
     alignItems: 'center',
-    marginHorizontal: spacing.xs,
-    ...shadow.md,
-    borderWidth: 2,
-    borderColor: 'transparent',
+    paddingHorizontal: spacing.sm,
   },
-  mine: {
-    borderColor: colors.border,
-  },
-  leading: {
-    backgroundColor: colors.highlight,
-    borderColor: colors.secondary,
-  },
-  crown: {
-    fontSize: 22,
+  mascot: {
+    height: 64,
+    width: 54,
     marginBottom: spacing.xs,
   },
   name: {
-    fontSize: fontSize.xs,
-    fontWeight: '700',
-    color: colors.text.secondary,
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
+    fontSize: 13,
+    fontFamily: fonts.bodyExtraBold,
+    color: colors.mid,
     marginBottom: 2,
   },
-  points: {
-    fontSize: fontSize.hero,
-    fontWeight: '900',
-    color: colors.text.primary,
-    lineHeight: fontSize.hero + 4,
+  score: {
+    fontSize: 30,
+    fontFamily: fonts.headingBold,
+    lineHeight: 36,
   },
-  pointsLeading: {
+  scoreMe: {
     color: colors.primary,
   },
-  label: {
-    fontSize: fontSize.sm,
-    fontWeight: '600',
-    color: colors.text.light,
-  },
-  completions: {
-    fontSize: fontSize.xs,
-    color: colors.text.light,
-    marginTop: spacing.xs,
+  scorePartner: {
+    color: colors.orange,
   },
 });

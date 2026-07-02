@@ -222,6 +222,22 @@ export class ChoreScoreStack extends cdk.Stack {
     completionsTable.grantReadData(getHistoryFn);
     usersTable.grantReadData(getHistoryFn);
 
+    const deleteCompletionFn = new lambdaNodejs.NodejsFunction(this, 'DeleteCompletion', {
+      ...commonLambdaProps,
+      entry: path.join(lambdaDir, 'history/delete.ts'),
+      functionName: 'ChoreScore-DeleteCompletion',
+    });
+    completionsTable.grantWriteData(deleteCompletionFn);
+    usersTable.grantReadData(deleteCompletionFn);
+
+    const updateCompletionFn = new lambdaNodejs.NodejsFunction(this, 'UpdateCompletion', {
+      ...commonLambdaProps,
+      entry: path.join(lambdaDir, 'history/update.ts'),
+      functionName: 'ChoreScore-UpdateCompletion',
+    });
+    completionsTable.grantReadWriteData(updateCompletionFn);
+    usersTable.grantReadData(updateCompletionFn);
+
     // ── Lambda: Badges ────────────────────────────────────────────────────────
 
     const getBadgesFn = new lambdaNodejs.NodejsFunction(this, 'GetBadges', {
@@ -282,7 +298,11 @@ export class ChoreScoreStack extends cdk.Stack {
     api.root.addResource('scores').addMethod('GET', fn(getScoresFn), auth);
 
     // /history
-    api.root.addResource('history').addMethod('GET', fn(getHistoryFn), auth);
+    const historyResource = api.root.addResource('history');
+    historyResource.addMethod('GET', fn(getHistoryFn), auth);
+    const completionResource = historyResource.addResource('{completionId}');
+    completionResource.addMethod('DELETE', fn(deleteCompletionFn), auth);
+    completionResource.addMethod('PUT', fn(updateCompletionFn), auth);
 
     // /badges
     api.root.addResource('badges').addMethod('GET', fn(getBadgesFn), auth);

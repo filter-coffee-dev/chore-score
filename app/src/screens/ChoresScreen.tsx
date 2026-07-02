@@ -11,7 +11,7 @@ import { api, ChoreWithStatus } from '../services/api';
 import { useStore } from '../store/useStore';
 import { colors, fonts, spacing, fontSize, radius, shadow } from '../theme';
 
-const HERO_IMG = require('../../assets/slide2-laundry.png');
+const HERO_IMG = require('../../assets/ChoresCreation.png');
 
 const EMOJIS = ['🧹', '🍽️', '🧺', '🚽', '🪟', '🌿', '🐕', '🛏️', '🧼', '🗑️', '🏠', '✨', '🪴', '🧴', '🪣'];
 const FREQUENCIES = ['daily', 'weekly', 'monthly', 'on_demand'] as const;

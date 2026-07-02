@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — ChoreScore</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #e8faf4;
+      color: #16463a;
+      line-height: 1.7;
+    }
+
+    header {
+      background: linear-gradient(135deg, #53a687, #27a07c);
+      padding: 40px 24px 32px;
+      text-align: center;
+      color: #fff;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      margin-top: 6px;
+      font-size: 0.95rem;
+      opacity: 0.88;
+    }
+
+    main {
+      max-width: 740px;
+      margin: 40px auto;
+      padding: 0 20px 60px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 32px 36px;
+      box-shadow: 0 4px 24px rgba(20, 70, 56, 0.08);
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #15795c;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    h2 .icon { font-size: 1.2rem; }
+
+    p { margin-bottom: 12px; font-size: 0.97rem; color: #2d4f42; }
+    p:last-child { margin-bottom: 0; }
+
+    ul {
+      margin: 8px 0 12px 20px;
+      font-size: 0.97rem;
+      color: #2d4f42;
+    }
+
+    ul li { margin-bottom: 6px; }
+
+    .updated {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #7fa689;
+      margin-bottom: 28px;
+    }
+
+    a { color: #15795c; text-decoration: underline; }
+
+    .pill {
+      display: inline-block;
+      background: #d8f0b0;
+      color: #1f6e3a;
+      font-size: 0.78rem;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 2px 10px;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.82rem;
+      color: #7fa689;
+      padding-bottom: 32px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🏆 ChoreScore</h1>
+  <p>Privacy Policy</p>
+</header>
+
+<main>
+  <p class="updated">Last updated: July 2, 2026</p>
+
+  <div class="card">
+    <h2><span class="icon">👋</span> Overview</h2>
+    <p>
+      ChoreScore ("we", "our", or "us") is a household chore-tracking app for couples. This Privacy Policy explains
+      what information we collect, how we use it, and your rights regarding that information.
+    </p>
+    <p>
+      We are committed to keeping your data minimal, secure, and never sold or shared for advertising.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">📋</span> Information We Collect</h2>
+
+    <p><strong>Account information</strong></p>
+    <ul>
+      <li>Email address — used to create and authenticate your account</li>
+      <li>Display name — used to identify you within your household</li>
+      <li>Password — stored as a secure hash by AWS Cognito; we never see your plain-text password</li>
+    </ul>
+
+    <p><strong>App activity data</strong></p>
+    <ul>
+      <li>Chores you create, complete, or unclaim</li>
+      <li>Points earned and completion timestamps</li>
+      <li>Avatar selection (character image preference)</li>
+      <li>Household membership (who you share a household with)</li>
+    </ul>
+
+    <p><strong>Device information</strong></p>
+    <ul>
+      <li>Device push notification token — used solely to send you chore reminders and household notifications</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">🔒</span> How We Use Your Information</h2>
+    <ul>
+      <li>To authenticate you and secure your account</li>
+      <li>To display your scores, streaks, and chore history to you and your household partner</li>
+      <li>To send push notifications about chore activity (you can disable these in device settings)</li>
+      <li>To calculate leaderboard standings and badge achievements within your household</li>
+    </ul>
+    <p>We do <strong>not</strong> use your data for advertising, profiling, or any purpose beyond operating the app.</p>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">🤝</span> Information Sharing</h2>
+    <p>
+      We do <strong>not</strong> sell, rent, or trade your personal information to any third party.
+    </p>
+    <p>We use the following third-party services to operate ChoreScore:</p>
+    <ul>
+      <li><strong>Amazon Web Services (AWS)</strong> — authentication (Cognito), database (DynamoDB), API (API Gateway + Lambda), and push notifications (Pinpoint). AWS processes data on our behalf under their Data Processing Addendum.</li>
+    </ul>
+    <p>
+      Your chore data is visible only to the members of your household (you and your partner).
+      No one else can see your data.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">🛡️</span> Data Security</h2>
+    <ul>
+      <li>All data is transmitted over HTTPS (TLS)</li>
+      <li>Passwords are hashed by AWS Cognito using industry-standard algorithms</li>
+      <li>API access requires a valid JWT token issued at sign-in</li>
+      <li>Data is stored in AWS us-east-1 (Virginia, USA)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">👶</span> Children's Privacy</h2>
+    <p>
+      ChoreScore is intended for adults (18+) or teenagers using the app together with a household partner.
+      We do not knowingly collect personal information from children under 13. If you believe a child has
+      provided us with personal information, please contact us so we can delete it.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">🗑️</span> Data Deletion</h2>
+    <p>
+      You can request deletion of your account and all associated data at any time by emailing us at the
+      address below. We will delete your data within 30 days of your request.
+    </p>
+    <p>
+      Deleting your account will permanently remove your profile, chore history, points, badges,
+      and household membership from our systems.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">📬</span> Contact Us</h2>
+    <p>
+      If you have any questions about this Privacy Policy or your data, please contact us at:
+    </p>
+    <p>
+      <strong>Email:</strong> <a href="mailto:asubbu87@gmail.com">asubbu87@gmail.com</a>
+    </p>
+  </div>
+
+  <div class="card">
+    <h2><span class="icon">🔄</span> Changes to This Policy</h2>
+    <p>
+      We may update this Privacy Policy from time to time. We will notify you of significant changes
+      by updating the "Last updated" date above. Continued use of the app after changes constitutes
+      acceptance of the updated policy.
+    </p>
+  </div>
+</main>
+
+<footer>
+  &copy; 2026 ChoreScore &mdash; filter-coffee-dev
+</footer>
+
+</body>
+</html>

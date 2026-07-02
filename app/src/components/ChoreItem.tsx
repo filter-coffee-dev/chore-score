@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { ChoreWithStatus } from '../services/api';
-import { colors, radius, spacing, fontSize, shadow } from '../theme';
+import { colors, fonts, radius, spacing, shadow } from '../theme';
 
 const WEIGHT_LABEL: Record<number, string> = {
   1: 'Quick', 2: 'Easy', 3: 'Medium', 4: 'Hard', 5: 'Beast',
@@ -27,39 +28,38 @@ export function ChoreItem({ chore, onComplete, onEdit, onDelete, completing }: P
     );
   }
 
+  const tileColors: [string, string] = chore.frequency === 'daily'
+    ? ['#3FB78F', '#15795C']
+    : ['#BCE06A', '#8FC23A'];
+
   return (
     <View style={[styles.card, chore.completedThisPeriod && styles.completed]}>
-      <TouchableOpacity
-        style={styles.checkArea}
-        onPress={() => !chore.completedThisPeriod && onComplete(chore.choreId)}
-        disabled={chore.completedThisPeriod || completing}
+      <LinearGradient
+        colors={chore.completedThisPeriod ? ['#D2EAD3', '#C8DDB8'] : tileColors}
+        start={{ x: 0.2, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.iconTile}
       >
-        <View style={[styles.check, chore.completedThisPeriod && styles.checkDone]}>
-          {chore.completedThisPeriod && <Text style={styles.checkMark}>✓</Text>}
-        </View>
-      </TouchableOpacity>
+        <Text style={styles.emoji}>{chore.emoji}</Text>
+      </LinearGradient>
 
       <View style={styles.info}>
-        <View style={styles.row}>
-          <View style={styles.emojiWrap}>
-            <Text style={styles.emoji}>{chore.emoji}</Text>
-          </View>
-          <Text style={[styles.name, chore.completedThisPeriod && styles.nameStruck]}>
-            {chore.name}
-          </Text>
-        </View>
-        <View style={styles.row}>
-          <View style={styles.weightPill}>
-            <Text style={styles.weightText}>+{chore.weight} · {WEIGHT_LABEL[chore.weight]}</Text>
-          </View>
-          <Text style={styles.freq}>{chore.frequency}</Text>
+        <Text style={[styles.name, chore.completedThisPeriod && styles.nameStruck]} numberOfLines={1}>
+          {chore.name}
+        </Text>
+        <View style={styles.metaRow}>
+          <Text style={styles.points}>+{chore.weight} pts</Text>
+          <Text style={styles.dot}>·</Text>
+          <Text style={styles.meta}>{WEIGHT_LABEL[chore.weight]}</Text>
+          <Text style={styles.dot}>·</Text>
+          <Text style={styles.meta}>{chore.frequency}</Text>
         </View>
         {chore.completedThisPeriod && chore.completedBy && (
-          <Text style={styles.completedBy}>Done by {chore.completedBy} ✅</Text>
+          <Text style={styles.completedBy}>✓ {chore.completedBy}</Text>
         )}
       </View>
 
-      {(onEdit || onDelete) && (
+      {onEdit || onDelete ? (
         <View style={styles.actions}>
           {onEdit && (
             <TouchableOpacity onPress={() => onEdit(chore)} style={styles.actionBtn}>
@@ -72,6 +72,16 @@ export function ChoreItem({ chore, onComplete, onEdit, onDelete, completing }: P
             </TouchableOpacity>
           )}
         </View>
+      ) : (
+        <TouchableOpacity
+          style={[styles.claimBtn, chore.completedThisPeriod && styles.claimBtnDone]}
+          onPress={() => !chore.completedThisPeriod && onComplete(chore.choreId)}
+          disabled={chore.completedThisPeriod || completing}
+        >
+          <Text style={[styles.claimText, chore.completedThisPeriod && styles.claimTextDone]}>
+            {completing ? '…' : chore.completedThisPeriod ? '✓' : 'Claim'}
+          </Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -81,50 +91,78 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.white,
     borderRadius: radius.lg,
-    padding: spacing.md,
+    padding: 12,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: spacing.sm,
     ...shadow.sm,
-  },
-  completed: { opacity: 0.55 },
-  checkArea: { marginRight: spacing.sm },
-  check: {
-    width: 30,
-    height: 30,
-    borderRadius: radius.full,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: colors.border,
+  },
+  completed: {
+    backgroundColor: colors.mintLight,
+    opacity: 0.8,
+  },
+  iconTile: {
+    width: 44,
+    height: 44,
+    borderRadius: 13,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  checkDone: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  checkMark: { color: colors.white, fontSize: 14, fontWeight: '800' },
-  info: { flex: 1 },
-  row: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
-  emojiWrap: {
-    width: 28, height: 28, borderRadius: radius.sm,
-    backgroundColor: colors.background,
-    alignItems: 'center', justifyContent: 'center',
-    marginRight: spacing.xs,
-  },
-  emoji: { fontSize: 16 },
-  name: { fontSize: fontSize.md, fontWeight: '600', color: colors.text.primary, flex: 1 },
-  nameStruck: { textDecorationLine: 'line-through', color: colors.text.light },
-  weightPill: {
-    backgroundColor: colors.highlight,
-    borderRadius: radius.full,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: 3,
     marginRight: spacing.sm,
+    flexShrink: 0,
   },
-  weightText: { fontSize: fontSize.xs, fontWeight: '700', color: colors.text.secondary },
-  freq: { fontSize: fontSize.xs, color: colors.text.light, textTransform: 'capitalize' },
-  completedBy: { fontSize: fontSize.xs, color: colors.primary, fontWeight: '600', marginTop: 2 },
+  emoji: { fontSize: 20 },
+  info: { flex: 1 },
+  name: {
+    fontSize: 13,
+    fontFamily: fonts.bodyExtraBold,
+    color: colors.ink,
+    marginBottom: 2,
+  },
+  nameStruck: { textDecorationLine: 'line-through', color: colors.muted },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 3 },
+  points: {
+    fontSize: 11,
+    fontFamily: fonts.bodyExtraBold,
+    color: colors.orange,
+  },
+  dot: { fontSize: 10, color: colors.muted },
+  meta: {
+    fontSize: 10,
+    fontFamily: fonts.bodyBold,
+    color: colors.muted,
+    textTransform: 'capitalize',
+  },
+  completedBy: {
+    fontSize: 10,
+    fontFamily: fonts.bodyBold,
+    color: colors.primary,
+    marginTop: 2,
+  },
   actions: { flexDirection: 'row' },
-  actionBtn: { padding: spacing.xs, marginLeft: spacing.xs },
+  actionBtn: { padding: spacing.xs, marginLeft: spacing.xs, opacity: 0.6 },
   actionIcon: { fontSize: 16 },
+  claimBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.full,
+    paddingHorizontal: 14,
+    paddingVertical: 7,
+    minWidth: 60,
+    alignItems: 'center',
+    ...shadow.button,
+  },
+  claimBtnDone: {
+    backgroundColor: colors.mintLight,
+    shadowOpacity: 0,
+    elevation: 0,
+  },
+  claimText: {
+    fontSize: 12,
+    fontFamily: fonts.bodyExtraBold,
+    color: colors.white,
+  },
+  claimTextDone: {
+    color: colors.muted,
+  },
 });

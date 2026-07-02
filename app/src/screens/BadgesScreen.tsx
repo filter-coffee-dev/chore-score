@@ -1,41 +1,74 @@
-import React, { useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, RefreshControl } from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { View, Text, ScrollView, StyleSheet, RefreshControl, Image, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
 import { api, Badge, BadgeDef } from '../services/api';
 import { useStore } from '../store/useStore';
-import { colors, spacing, fontSize, radius, shadow } from '../theme';
+import { colors, fonts, spacing, radius, shadow } from '../theme';
+
+const MEDAL = require('../../assets/badge-medal.png');
+const STAR = require('../../assets/badge-star.png');
+const BANNER = require('../../assets/badge-banner.png');
 
 function BadgeCard({ badge, earned }: { badge: BadgeDef; earned?: Badge }) {
   return (
-    <View style={[styles.badgeCard, !earned && styles.badgeLocked]}>
-      <View style={[styles.badgeIconWrap, earned && styles.badgeIconEarned]}>
-        <Text style={[styles.badgeEmoji, !earned && styles.badgeEmojiLocked]}>{badge.emoji}</Text>
-      </View>
-      <Text style={[styles.badgeName, !earned && styles.badgeNameLocked]}>{badge.name}</Text>
-      <Text style={styles.badgeDesc} numberOfLines={2}>{badge.description}</Text>
-      {earned?.earnedAt && (
-        <Text style={styles.earnedAt}>
-          {new Date(earned.earnedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
-        </Text>
+    <View style={[styles.card, earned ? styles.cardEarned : styles.cardLocked]}>
+      {/* Icon circle */}
+      {earned ? (
+        <LinearGradient
+          colors={['#D8F0B0', '#A6D44F44']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={styles.iconCircle}
+        >
+          <Text style={styles.emoji}>{badge.emoji}</Text>
+          <Text style={styles.sparkle}>✨</Text>
+        </LinearGradient>
+      ) : (
+        <View style={styles.iconCircleLocked}>
+          <Text style={[styles.emoji, styles.emojiLocked]}>{badge.emoji}</Text>
+        </View>
       )}
-      {!earned && <Text style={styles.locked}>🔒</Text>}
+
+      <Text style={[styles.name, !earned && styles.nameLocked]} numberOfLines={1}>
+        {badge.name}
+      </Text>
+      <Text style={[styles.desc, !earned && styles.descLocked]} numberOfLines={2}>
+        {badge.description}
+      </Text>
+
+      {earned?.earnedAt ? (
+        <View style={styles.dateChip}>
+          <Text style={styles.dateText}>
+            {new Date(earned.earnedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
+          </Text>
+        </View>
+      ) : (
+        <Text style={styles.lock}>🔒</Text>
+      )}
     </View>
   );
 }
 
 export default function BadgesScreen() {
-  const [refreshing, setRefreshing] = React.useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { memberBadges, allBadges, userId, setBadges } = useStore();
 
   const load = useCallback(async () => {
     try {
       const data = await api.badges.get();
       setBadges(data.members, data.allBadges);
-    } catch {}
+    } catch {} finally {
+      setLoading(false);
+    }
   }, [setBadges]);
 
-  useFocusEffect(useCallback(() => { load(); }, [load]));
+  useFocusEffect(useCallback(() => {
+    setLoading(true);
+    load();
+  }, [load]));
 
   async function onRefresh() {
     setRefreshing(true);
@@ -43,33 +76,64 @@ export default function BadgesScreen() {
     setRefreshing(false);
   }
 
+  const myEarned = memberBadges.find(m => m.userId === userId)?.badges.length ?? 0;
+  const total = allBadges.length || 10;
+
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Badges 🏅</Text>
-      </View>
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={styles.scroll}
         showsVerticalScrollIndicator={false}
       >
+        {/* ── Header ─────────────────────────────────────────────── */}
+        <View style={styles.header}>
+          {/* Title row */}
+          <View style={styles.titleRow}>
+            <View style={styles.titleLeft}>
+              <Image
+                source={MEDAL}
+                style={[styles.medalIcon, { mixBlendMode: 'multiply' } as any]}
+                resizeMode="contain"
+              />
+              <Text style={styles.titleText}>Badges</Text>
+            </View>
+            <View style={styles.earnedPill}>
+              <Image
+                source={STAR}
+                style={[styles.starIcon, { mixBlendMode: 'multiply' } as any]}
+                resizeMode="contain"
+              />
+              <Text style={styles.earnedPillText}>{myEarned}/{total} earned</Text>
+            </View>
+          </View>
+
+          {/* Subtitle */}
+          <Text style={styles.subtitle}>
+            Earn badges by completing chores and building great habits!
+          </Text>
+
+          {/* Hero banner */}
+          <View style={styles.bannerWrap}>
+            <Image
+              source={BANNER}
+              style={[
+                styles.bannerImg,
+                { objectPosition: 'center 30%', mixBlendMode: 'multiply' } as any,
+              ]}
+              resizeMode="cover"
+            />
+          </View>
+        </View>
+
+        {/* ── Badge grid (per member) ─────────────────────────────── */}
         {memberBadges.map((member) => {
           const earnedMap = Object.fromEntries(member.badges.map((b) => [b.id, b]));
-          const earnedCount = member.badges.length;
           const isMe = member.userId === userId;
+
           return (
             <View key={member.userId} style={styles.memberSection}>
-              <View style={styles.memberHeader}>
-                <Text style={styles.memberName}>{isMe ? 'You' : member.userName}</Text>
-                <View style={styles.countBadge}>
-                  <Text style={styles.countText}>{earnedCount}/{allBadges.length} earned</Text>
-                </View>
-              </View>
-              {earnedCount === 0 && (
-                <View style={styles.noBadges}>
-                  <Text style={styles.noBadgesText}>No badges yet. Get to work! 💪</Text>
-                </View>
-              )}
+              <Text style={styles.memberName}>{isMe ? 'You' : member.userName}</Text>
               <View style={styles.grid}>
                 {allBadges.map((def) => (
                   <BadgeCard key={def.id} badge={def} earned={earnedMap[def.id]} />
@@ -78,11 +142,16 @@ export default function BadgesScreen() {
             </View>
           );
         })}
-        {memberBadges.length === 0 && (
+
+        {loading ? (
+          <View style={styles.spinnerWrap}>
+            <ActivityIndicator size="large" color={colors.primary} />
+          </View>
+        ) : memberBadges.length === 0 && (
           <View style={styles.empty}>
             <Text style={styles.emptyEmoji}>🏅</Text>
             <Text style={styles.emptyTitle}>No badges yet!</Text>
-            <Text style={styles.emptySubtext}>Complete chores to unlock achievements. Go on, shoo.</Text>
+            <Text style={styles.emptySub}>Complete chores to unlock achievements.</Text>
           </View>
         )}
       </ScrollView>
@@ -92,48 +161,180 @@ export default function BadgesScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
+  scroll: { paddingBottom: spacing.xl },
+
+  // Header
   header: {
-    paddingHorizontal: spacing.md, paddingVertical: spacing.md,
+    paddingHorizontal: 14,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
   },
-  title: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary },
-  content: { paddingHorizontal: spacing.md, paddingBottom: 110 },
-  memberSection: { marginBottom: spacing.xl },
-  memberHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: spacing.md },
-  memberName: { fontSize: fontSize.lg, fontWeight: '800', color: colors.text.primary, flex: 1 },
-  countBadge: {
-    backgroundColor: colors.secondary, borderRadius: radius.full,
-    paddingHorizontal: spacing.sm, paddingVertical: 4,
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
   },
-  countText: { fontSize: fontSize.xs, fontWeight: '700', color: colors.text.primary },
-  noBadges: {
-    backgroundColor: colors.white, borderRadius: radius.lg,
-    padding: spacing.md, marginBottom: spacing.md, alignItems: 'center',
-    ...shadow.sm,
+  titleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  noBadgesText: { fontSize: fontSize.sm, color: colors.text.secondary },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  badgeCard: {
-    backgroundColor: colors.white, borderRadius: radius.xl,
-    padding: spacing.md, alignItems: 'center',
-    width: '47%', ...shadow.md,
+  medalIcon: {
+    height: 36,
+    width: 36,
   },
-  badgeLocked: { opacity: 0.45 },
-  badgeIconWrap: {
-    width: 56, height: 56, borderRadius: radius.lg,
+  titleText: {
+    fontSize: 24,
+    fontFamily: fonts.headingBold,
+    color: '#16463A',
+  },
+  earnedPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderWidth: 1.5,
+    borderColor: '#C8DDB8',
+    borderRadius: 999,
+    paddingTop: 5,
+    paddingBottom: 5,
+    paddingLeft: 6,
+    paddingRight: 12,
+    gap: 4,
+  },
+  starIcon: {
+    height: 20,
+    width: 20,
+  },
+  earnedPillText: {
+    fontSize: 12,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#16463A',
+  },
+  subtitle: {
+    fontSize: 11,
+    fontFamily: fonts.bodyBold,
+    color: '#7FA689',
+    marginBottom: spacing.sm,
+    lineHeight: 16,
+  },
+
+  // Banner
+  bannerWrap: {
+    height: 154,
+    borderRadius: radius.lg,
+    overflow: 'hidden',
     backgroundColor: colors.background,
-    alignItems: 'center', justifyContent: 'center',
     marginBottom: spacing.sm,
   },
-  badgeIconEarned: { backgroundColor: colors.highlight },
-  badgeEmoji: { fontSize: 32 },
-  badgeEmojiLocked: { opacity: 0.5 },
-  badgeName: { fontSize: fontSize.sm, fontWeight: '800', color: colors.text.primary, textAlign: 'center', marginBottom: 2 },
-  badgeNameLocked: { color: colors.text.light },
-  badgeDesc: { fontSize: fontSize.xs, color: colors.text.secondary, textAlign: 'center', lineHeight: 16 },
-  earnedAt: { fontSize: fontSize.xs, color: colors.primary, fontWeight: '700', marginTop: spacing.xs },
-  locked: { fontSize: fontSize.sm, color: colors.text.light, marginTop: spacing.xs },
-  empty: { alignItems: 'center', padding: spacing.xxl },
-  emptyEmoji: { fontSize: 64, marginBottom: spacing.md },
-  emptyTitle: { fontSize: fontSize.xl, fontWeight: '800', color: colors.text.primary, marginBottom: spacing.sm },
-  emptySubtext: { fontSize: fontSize.sm, color: colors.text.secondary, textAlign: 'center' },
+  bannerImg: {
+    width: '100%',
+    height: '100%',
+  },
+
+  // Member section
+  memberSection: {
+    paddingHorizontal: 14,
+    marginBottom: spacing.lg,
+  },
+  memberName: {
+    fontSize: 16,
+    fontFamily: fonts.headingBold,
+    color: colors.ink,
+    marginBottom: spacing.sm,
+  },
+
+  // Grid
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+
+  // Badge cards
+  card: {
+    borderRadius: 20,
+    padding: 12,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    width: '47.5%',
+  },
+  cardEarned: {
+    backgroundColor: '#ffffff',
+    borderWidth: 1.5,
+    borderColor: '#C8E8AE',
+    ...shadow.sm,
+  },
+  cardLocked: {
+    backgroundColor: '#F5F7F2',
+  },
+
+  // Icon circles
+  iconCircle: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+    position: 'relative',
+  },
+  iconCircleLocked: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#E8EDE4',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.sm,
+  },
+  emoji: { fontSize: 24 },
+  emojiLocked: { opacity: 0.55 },
+  sparkle: { position: 'absolute', top: -4, right: -4, fontSize: 14 },
+
+  // Text
+  name: {
+    fontSize: 13,
+    fontFamily: fonts.headingBold,
+    color: '#16463A',
+    textAlign: 'center',
+    marginBottom: 2,
+  },
+  nameLocked: { color: '#9EBBA4' },
+  desc: {
+    fontSize: 10,
+    fontFamily: fonts.bodyBold,
+    color: '#7FA689',
+    textAlign: 'center',
+    lineHeight: 14,
+  },
+  descLocked: { color: '#B8CCBA' },
+
+  // Date chip
+  dateChip: {
+    marginTop: spacing.xs,
+    backgroundColor: '#D8F0B0',
+    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+  },
+  dateText: {
+    fontSize: 11,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#1f6e3a',
+  },
+  lock: {
+    fontSize: 12,
+    marginTop: spacing.xs,
+    opacity: 0.4,
+  },
+
+  // Spinner
+  spinnerWrap: { paddingVertical: spacing.xxl, alignItems: 'center' },
+
+  // Empty state
+  empty: { alignItems: 'center', paddingVertical: spacing.xxl, paddingHorizontal: spacing.lg },
+  emptyEmoji: { fontSize: 56, marginBottom: spacing.md },
+  emptyTitle: { fontSize: 18, fontFamily: fonts.headingBold, color: colors.ink, marginBottom: spacing.sm },
+  emptySub: { fontSize: 13, fontFamily: fonts.bodyBold, color: colors.mid, textAlign: 'center' },
 });

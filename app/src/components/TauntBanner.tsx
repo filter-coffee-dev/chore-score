@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { colors, radius, spacing, fontSize, shadow } from '../theme';
+import { LinearGradient } from 'expo-linear-gradient';
+import { fonts } from '../theme';
 
 interface Props {
   taunt: string;
@@ -9,35 +10,57 @@ interface Props {
 export function TauntBanner({ taunt }: Props) {
   if (!taunt) return null;
   return (
-    <View style={styles.container}>
-      <Text style={styles.quote}>"</Text>
-      <Text style={styles.text}>{taunt}</Text>
-    </View>
+    <LinearGradient
+      colors={['#B4DD52', '#8FC23A']}
+      start={{ x: 1, y: 0 }}
+      end={{ x: 0, y: 1 }}
+      style={styles.container}
+    >
+      <Text style={styles.emoji}>😤</Text>
+      <View style={styles.textWrap}>
+        <Text style={styles.label}>Taunt</Text>
+        <Text style={styles.text}>{taunt}</Text>
+      </View>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: colors.accent,
-    borderRadius: radius.xl,
-    padding: spacing.lg,
-    marginHorizontal: spacing.md,
-    marginVertical: spacing.sm,
-    ...shadow.sm,
+    borderRadius: 18,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    marginHorizontal: 22,
+    marginTop: 10,
+    marginBottom: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+    shadowColor: '#8FC23A',
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.6,
+    shadowRadius: 18,
+    elevation: 6,
   },
-  quote: {
-    fontSize: 32,
-    fontWeight: '900',
-    color: 'rgba(26,58,46,0.2)',
-    lineHeight: 24,
-    marginBottom: -4,
+  emoji: {
+    fontSize: 22,
+  },
+  textWrap: {
+    flex: 1,
+  },
+  label: {
+    fontSize: 10,
+    fontFamily: fonts.bodyExtraBold,
+    color: '#1f6e3a',
+    textTransform: 'uppercase',
+    letterSpacing: 1.2,
+    marginBottom: 2,
   },
   text: {
-    fontSize: fontSize.sm,
-    fontWeight: '600',
-    color: colors.text.primary,
+    fontSize: 13,
+    fontFamily: fonts.bodyBold,
+    color: '#1f6e3a',
     fontStyle: 'italic',
-    textAlign: 'center',
     lineHeight: 20,
   },
 });
