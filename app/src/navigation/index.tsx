@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
 import { colors, fonts } from '../theme';
 
 import SignInScreen from '../screens/auth/SignInScreen';
@@ -66,10 +66,14 @@ const TAB_LABELS: Record<string, string> = {
 
 function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
+  // React Navigation consumes the bottom inset in its container, so
+  // useSafeAreaInsets() often returns 0 here on Android edge-to-edge.
+  // Fall back to initialWindowMetrics which reads the raw screen-level value.
+  const bottomInset = insets.bottom || (initialWindowMetrics?.insets.bottom ?? 0);
 
   return (
-    <View style={{ overflow: 'visible', backgroundColor: '#ffffff' }}>
-      <View style={[tabStyles.bar, { paddingBottom: insets.bottom }]}>
+    <View style={{ backgroundColor: '#ffffff' }}>
+      <View style={[tabStyles.bar, { paddingBottom: bottomInset }]}>
         {state.routes.map((route, index) => {
           const focused = state.index === index;
           const label = TAB_LABELS[route.name] ?? route.name;
