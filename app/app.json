@@ -12,7 +12,8 @@
       "backgroundColor": "#e8faf4"
     },
     "assetBundlePatterns": [
-      "**/*"
+      "assets/icon.png",
+      "assets/Banner-Family.png"
     ],
     "ios": {
       "supportsTablet": false,

@@ -23,10 +23,6 @@ const SLIDES = [
   require('../../assets/slide2-cleaning.png'),
   require('../../assets/slide2-dropoff.png'),
   require('../../assets/slide2-bathroom.png'),
-  require('../../assets/slide2-laundry.png'),
-  require('../../assets/slide2-roadtrip.png'),
-  require('../../assets/slide2-p1.png'),
-  require('../../assets/slide2-p2.png'),
   require('../../assets/slide2-p3.png'),
 ];
 

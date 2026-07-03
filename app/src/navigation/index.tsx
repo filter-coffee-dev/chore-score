@@ -68,7 +68,7 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
 
   return (
-    <View style={{ overflow: 'visible' }}>
+    <View style={{ overflow: 'visible', backgroundColor: '#ffffff' }}>
       <View style={[tabStyles.bar, { paddingBottom: insets.bottom }]}>
         {state.routes.map((route, index) => {
           const focused = state.index === index;
