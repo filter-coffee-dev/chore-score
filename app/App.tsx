@@ -1,7 +1,8 @@
 // Must be first import — patches console before expo-notifications initializes
 import './src/utils/suppressExpoGoWarnings';
 import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Platform } from 'react-native';
+import * as NavigationBar from 'expo-navigation-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useFonts } from 'expo-font';
@@ -37,6 +38,10 @@ export default function App() {
 
   useEffect(() => {
     bootstrap();
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync('#ffffff');
+      NavigationBar.setButtonStyleAsync('dark');
+    }
   }, []);
 
   async function bootstrap() {

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useSafeAreaInsets, initialWindowMetrics } from 'react-native-safe-area-context';
@@ -148,7 +148,7 @@ function MainTabs() {
   return (
     <Tab.Navigator
       tabBar={(props) => <CustomTabBar {...props} />}
-      screenOptions={{ headerShown: false }}
+      screenOptions={{ headerShown: false, tabBarStyle: { backgroundColor: '#ffffff' } }}
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Chores" component={ChoresScreen} />
@@ -185,9 +185,18 @@ interface AppNavigatorProps {
   hasHousehold: boolean;
 }
 
+const AppTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    background: '#e8faf4',
+    card: '#ffffff',
+  },
+};
+
 export function AppNavigator({ isLoggedIn, hasHousehold }: AppNavigatorProps) {
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={AppTheme}>
       <RootStack.Navigator screenOptions={{ headerShown: false }}>
         {!isLoggedIn || !hasHousehold ? (
           <RootStack.Screen name="Auth" component={AuthNavigator} />
