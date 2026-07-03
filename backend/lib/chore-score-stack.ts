@@ -154,6 +154,14 @@ export class ChoreScoreStack extends cdk.Stack {
     householdsTable.grantReadData(getHouseholdFn);
     usersTable.grantReadData(getHouseholdFn);
 
+    const leaveHouseholdFn = new lambdaNodejs.NodejsFunction(this, 'LeaveHousehold', {
+      ...commonLambdaProps,
+      entry: path.join(lambdaDir, 'household/leave.ts'),
+      functionName: 'ChoreScore-LeaveHousehold',
+    });
+    householdsTable.grantReadWriteData(leaveHouseholdFn);
+    usersTable.grantReadWriteData(leaveHouseholdFn);
+
     // ── Lambda: Chores ────────────────────────────────────────────────────────
 
     const listChoresFn = new lambdaNodejs.NodejsFunction(this, 'ListChores', {
@@ -282,6 +290,7 @@ export class ChoreScoreStack extends cdk.Stack {
     const householdResource = api.root.addResource('household');
     householdResource.addMethod('POST', fn(createHouseholdFn), auth);
     householdResource.addMethod('GET', fn(getHouseholdFn), auth);
+    householdResource.addMethod('DELETE', fn(leaveHouseholdFn), auth);
     householdResource.addResource('join').addMethod('POST', fn(joinHouseholdFn), auth);
 
     // /chores

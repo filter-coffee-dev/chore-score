@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ScrollView, Image, Share } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { showAlert } from '../utils/alert';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -16,7 +16,8 @@ const AVATAR_ASSETS = {
 
 export default function SettingsScreen() {
   const [signingOut, setSigningOut] = useState(false);
-  const { userName, household, scores, userId, streak, memberBadges, reset, setScores, setMyAvatar } = useStore();
+  const [leavingHousehold, setLeavingHousehold] = useState(false);
+  const { userName, household, scores, userId, streak, memberBadges, reset, setScores, setMyAvatar, setHousehold, setChores } = useStore();
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<any>();
 
@@ -61,6 +62,33 @@ export default function SettingsScreen() {
     }
   }
 
+  function handleLeaveHousehold() {
+    Alert.alert(
+      'Leave household?',
+      "Your scores and history stay on record, but you'll be disconnected from this household.",
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Leave',
+          style: 'destructive',
+          onPress: async () => {
+            setLeavingHousehold(true);
+            try {
+              await api.household.leave();
+              setHousehold(null);
+              setScores([], 0, '');
+              setChores([]);
+            } catch (err: unknown) {
+              showAlert('Error', (err as Error).message);
+            } finally {
+              setLeavingHousehold(false);
+            }
+          },
+        },
+      ],
+    );
+  }
+
   const myBadges = memberBadges.find((m) => m.userId === userId);
   const totalChores = myScore?.totalCompletions ?? 0;
   const earnedBadges = myBadges?.badges.length ?? 0;
@@ -97,15 +125,29 @@ export default function SettingsScreen() {
             <Text style={styles.avatarPts}>{myScore?.totalPoints ?? 0} pts</Text>
           </View>
 
-          <View style={styles.avatarWrap}>
-            <View style={styles.avatarCircleWrap}>
-              <View style={styles.avatarCircle}>
-                <Image source={AVATAR_ASSETS[partnerAvatarChoice]} style={styles.avatarImg} resizeMode="contain" />
+          {partnerScoreItem ? (
+            <View style={styles.avatarWrap}>
+              <View style={styles.avatarCircleWrap}>
+                <View style={styles.avatarCircle}>
+                  <Image source={AVATAR_ASSETS[partnerAvatarChoice]} style={styles.avatarImg} resizeMode="contain" />
+                </View>
               </View>
+              <Text style={styles.avatarName}>{partnerScoreItem.userName?.split(' ')[0] ?? 'Partner'}</Text>
+              <Text style={styles.avatarPts}>{partnerScoreItem.totalPoints ?? 0} pts</Text>
             </View>
-            <Text style={styles.avatarName}>{partnerScoreItem?.userName?.split(' ')[0] ?? 'Partner'}</Text>
-            <Text style={styles.avatarPts}>{partnerScoreItem?.totalPoints ?? 0} pts</Text>
-          </View>
+          ) : (
+            <TouchableOpacity
+              style={styles.inviteAvatarWrap}
+              activeOpacity={0.8}
+              onPress={() => household?.inviteCode && Share.share({ message: `Join my ChoreScore household! Use invite code: ${household.inviteCode}` })}
+            >
+              <View style={styles.inviteAvatarCircle}>
+                <Text style={styles.inviteAvatarIcon}>+</Text>
+              </View>
+              <Text style={styles.inviteAvatarLabel}>Invite</Text>
+              <Text style={styles.inviteAvatarCode}>{household?.inviteCode ?? '—'}</Text>
+            </TouchableOpacity>
+          )}
         </View>
 
         {/* Stat chips */}
@@ -174,6 +216,17 @@ export default function SettingsScreen() {
             <Text style={styles.rowValue}>1.0.0</Text>
           </View>
         </View>
+
+        {/* Leave household */}
+        {household && (
+          <TouchableOpacity
+            style={styles.leaveBtn}
+            onPress={handleLeaveHousehold}
+            disabled={leavingHousehold}
+          >
+            <Text style={styles.leaveText}>{leavingHousehold ? 'Leaving…' : '🚪 Leave Household'}</Text>
+          </TouchableOpacity>
+        )}
 
         {/* Sign out */}
         <TouchableOpacity style={styles.signOutBtn} onPress={handleSignOut} disabled={signingOut}>
@@ -344,11 +397,51 @@ const styles = StyleSheet.create({
     padding: spacing.md, marginTop: spacing.sm,
   },
   waitText: { fontSize: 12, fontFamily: fonts.bodyBold, color: colors.mid, textAlign: 'center' },
+
+  // Invite placeholder (partner slot when no partner yet)
+  inviteAvatarWrap: { alignItems: 'center' },
+  inviteAvatarCircle: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: 'rgba(255,255,255,0.18)',
+    borderWidth: 2.5,
+    borderColor: 'rgba(255,255,255,0.5)',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  inviteAvatarIcon: {
+    fontSize: 36,
+    color: 'rgba(255,255,255,0.8)',
+    lineHeight: 40,
+  },
+  inviteAvatarLabel: {
+    fontSize: 13,
+    fontFamily: fonts.headingBold,
+    color: colors.white,
+    marginTop: 7,
+  },
+  inviteAvatarCode: {
+    fontSize: 11,
+    fontFamily: fonts.bodyBold,
+    color: '#A8DFC4',
+    marginTop: 1,
+    letterSpacing: 1.5,
+  },
+  leaveBtn: {
+    backgroundColor: colors.white, borderRadius: radius.full,
+    padding: spacing.md, alignItems: 'center',
+    borderWidth: 2, borderColor: '#F0C97A',
+    marginTop: spacing.lg,
+    ...shadow.sm,
+  },
+  leaveText: { fontSize: 15, fontFamily: fonts.headingBold, color: '#B87320' },
   signOutBtn: {
     backgroundColor: colors.white, borderRadius: radius.full,
     padding: spacing.md, alignItems: 'center',
     borderWidth: 2, borderColor: colors.redLight,
-    marginTop: spacing.xl,
+    marginTop: spacing.md,
     ...shadow.sm,
   },
   signOutText: { fontSize: 15, fontFamily: fonts.headingBold, color: colors.red },

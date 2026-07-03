@@ -314,29 +314,37 @@ export default function HistoryScreen() {
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
 
         {/* Card 1 — Head to Head */}
-        <View style={styles.card}>
-          <Text style={styles.cardLabel}>ALL TIME · HEAD TO HEAD</Text>
-          <View style={styles.h2hRow}>
-            <View style={styles.h2hSide}>
-              <Image source={STATS_ASSETS[myScore?.avatar ?? 'guy']} style={[styles.statsMascot, { mixBlendMode: 'multiply' } as any]} resizeMode="contain" />
-              <Text style={styles.h2hName}>{myName}</Text>
-              <Text style={[styles.h2hScore, { color: '#15795C' }]}>{fmt(samPts)}</Text>
+        {partnerScore ? (
+          <View style={styles.card}>
+            <Text style={styles.cardLabel}>ALL TIME · HEAD TO HEAD</Text>
+            <View style={styles.h2hRow}>
+              <View style={styles.h2hSide}>
+                <Image source={STATS_ASSETS[myScore?.avatar ?? 'guy']} style={[styles.statsMascot, { mixBlendMode: 'multiply' } as any]} resizeMode="contain" />
+                <Text style={styles.h2hName}>{myName}</Text>
+                <Text style={[styles.h2hScore, { color: '#15795C' }]}>{fmt(samPts)}</Text>
+              </View>
+              <View style={styles.vsCenter}>
+                <View style={styles.vsStar}><Text style={styles.vsStarText}>VS</Text></View>
+              </View>
+              <View style={styles.h2hSide}>
+                <Image source={STATS_ASSETS[partnerScore.avatar ?? 'girl']} style={[styles.statsMascot, { mixBlendMode: 'multiply' } as any]} resizeMode="contain" />
+                <Text style={styles.h2hName}>{partnerName}</Text>
+                <Text style={[styles.h2hScore, { color: '#EE8C3C' }]}>{fmt(jordanPts)}</Text>
+              </View>
             </View>
-            <View style={styles.vsCenter}>
-              <View style={styles.vsStar}><Text style={styles.vsStarText}>VS</Text></View>
-            </View>
-            <View style={styles.h2hSide}>
-              <Image source={STATS_ASSETS[partnerScore?.avatar ?? 'girl']} style={[styles.statsMascot, { mixBlendMode: 'multiply' } as any]} resizeMode="contain" />
-              <Text style={styles.h2hName}>{partnerName}</Text>
-              <Text style={[styles.h2hScore, { color: '#EE8C3C' }]}>{fmt(jordanPts)}</Text>
+            <SplitBar samPct={samPct} height={8} />
+            <View style={styles.splitLabels}>
+              <Text style={styles.splitLabelSam}>{samPct}% · {fmt(samPts)} pts</Text>
+              <Text style={styles.splitLabelJordan}>{100 - samPct}% · {fmt(jordanPts)} pts</Text>
             </View>
           </View>
-          <SplitBar samPct={samPct} height={8} />
-          <View style={styles.splitLabels}>
-            <Text style={styles.splitLabelSam}>{samPct}% · {fmt(samPts)} pts</Text>
-            <Text style={styles.splitLabelJordan}>{100 - samPct}% · {fmt(jordanPts)} pts</Text>
+        ) : (
+          <View style={[styles.card, styles.waitingCard]}>
+            <Text style={styles.waitingEmoji}>⏳</Text>
+            <Text style={styles.waitingTitle}>Waiting for your partner</Text>
+            <Text style={styles.waitingSub}>Head-to-head stats will appear once your partner joins</Text>
           </View>
-        </View>
+        )}
 
         {/* Card 2 — Momentum (line chart) */}
         <View style={styles.card}>
@@ -570,4 +578,10 @@ const styles = StyleSheet.create({
     borderRadius: 8, paddingHorizontal: 8, paddingVertical: 4,
   },
   cancelBtnText: { fontSize: 11, fontFamily: fonts.bodyBold, color: '#9EBBA4' },
+
+  // Waiting-for-partner card
+  waitingCard: { alignItems: 'center', paddingVertical: spacing.xl },
+  waitingEmoji: { fontSize: 36, marginBottom: 8 },
+  waitingTitle: { fontSize: 15, fontFamily: fonts.headingBold, color: colors.ink, marginBottom: 4 },
+  waitingSub: { fontSize: 12, fontFamily: fonts.bodyBold, color: colors.mid, textAlign: 'center' },
 });

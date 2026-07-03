@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  RefreshControl, Animated, Image, Dimensions, PanResponder,
+  RefreshControl, Animated, Image, Dimensions, PanResponder, Share,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { showAlert } from '../utils/alert';
@@ -124,7 +124,7 @@ function ChoreSlideshow() {
 export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const [completing, setCompleting] = useState<string | null>(null);
-  const { scores, streak, taunt, chores, userId, userName, setScores, setChores } = useStore();
+  const { scores, streak, taunt, chores, userId, userName, household, setScores, setChores } = useStore();
 
   const starSpin = useRef(new Animated.Value(0)).current;
 
@@ -207,14 +207,14 @@ export default function HomeScreen() {
           </View>
 
           {/* Scores */}
-          {scores.length > 0 ? (
+          {scores.length > 0 && partnerScore ? (
             <View style={styles.scoresRow}>
               {myScore && <ScoreCard score={myScore} isMe={true} mascot={myScore.avatar ?? 'guy'} />}
               <View style={styles.vsWrap}>
                 <Animated.Text style={[styles.vsStar, { transform: [{ rotate: spin }] }]}>★</Animated.Text>
                 <Text style={styles.vsText}>VS</Text>
               </View>
-              {partnerScore && <ScoreCard score={partnerScore} isMe={false} mascot={partnerScore.avatar ?? 'girl'} />}
+              <ScoreCard score={partnerScore} isMe={false} mascot={partnerScore.avatar ?? 'girl'} />
             </View>
           ) : (
             <View style={styles.emptyScores}>
@@ -223,8 +223,27 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Taunt */}
-        {taunt ? <TauntBanner taunt={taunt} /> : null}
+        {/* Waiting for partner */}
+        {scores.length > 0 && !partnerScore && household?.inviteCode && (
+          <View style={styles.inviteCard}>
+            <Text style={styles.inviteEmoji}>👀</Text>
+            <Text style={styles.inviteTitle}>Waiting for your partner</Text>
+            <Text style={styles.inviteSub}>Share your invite code to get the rivalry started</Text>
+            <View style={styles.inviteCodeRow}>
+              <Text style={styles.inviteCode}>{household.inviteCode}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.inviteBtn}
+              onPress={() => Share.share({ message: `Join my ChoreScore household! Use invite code: ${household.inviteCode}` })}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.inviteBtnText}>Share Invite Code</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Taunt — only show when both players present */}
+        {taunt && partnerScore ? <TauntBanner taunt={taunt} /> : null}
 
         {/* Up for grabs */}
         <View style={styles.section}>
@@ -383,6 +402,58 @@ const styles = StyleSheet.create({
     fontFamily: fonts.bodyBold,
     color: colors.mid,
     textAlign: 'center',
+  },
+
+  // Invite card
+  inviteCard: {
+    marginHorizontal: 16,
+    marginTop: 12,
+    backgroundColor: colors.white,
+    borderRadius: 24,
+    padding: 20,
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#C8DDB8',
+    ...shadow.md,
+  },
+  inviteEmoji: { fontSize: 36, marginBottom: 8 },
+  inviteTitle: {
+    fontSize: 16,
+    fontFamily: fonts.headingBold,
+    color: colors.ink,
+    marginBottom: 4,
+  },
+  inviteSub: {
+    fontSize: 12,
+    fontFamily: fonts.bodyBold,
+    color: colors.mid,
+    textAlign: 'center',
+    marginBottom: 14,
+  },
+  inviteCodeRow: {
+    backgroundColor: '#EEF5E6',
+    borderRadius: radius.full,
+    paddingHorizontal: 24,
+    paddingVertical: 10,
+    marginBottom: 12,
+  },
+  inviteCode: {
+    fontSize: 22,
+    fontFamily: fonts.headingBold,
+    color: colors.primary,
+    letterSpacing: 4,
+  },
+  inviteBtn: {
+    backgroundColor: colors.primary,
+    borderRadius: radius.full,
+    paddingHorizontal: 28,
+    paddingVertical: 12,
+    ...shadow.button,
+  },
+  inviteBtnText: {
+    fontSize: 14,
+    fontFamily: fonts.headingBold,
+    color: colors.white,
   },
 
   // Sections

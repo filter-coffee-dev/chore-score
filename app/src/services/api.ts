@@ -34,6 +34,7 @@ export const api = {
       member1Id: string; member1Name: string;
       member2Id?: string; member2Name?: string;
     }>('/household'),
+    leave: () => del<{ message: string }>('/household'),
   },
 
   chores: {
