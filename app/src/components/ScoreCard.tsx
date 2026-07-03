@@ -13,7 +13,7 @@ interface Props {
 }
 
 export function ScoreCard({ score, isMe, mascot = 'guy' }: Props) {
-  const displayName = isMe ? 'You' : score.userName.split(' ')[0];
+  const displayName = score.userName.split(' ')[0];
   const target = score.totalPoints;
   const [displayed, setDisplayed] = useState(0);
 

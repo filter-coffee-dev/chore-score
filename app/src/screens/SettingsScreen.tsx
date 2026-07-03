@@ -93,7 +93,7 @@ export default function SettingsScreen() {
                 <Text style={styles.editBadgeIcon}>✎</Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.avatarName}>{household?.member1Name ?? userName?.split(' ')[0] ?? 'You'}</Text>
+            <Text style={styles.avatarName}>{myScore?.userName?.split(' ')[0] ?? userName?.split(' ')[0] ?? 'You'}</Text>
             <Text style={styles.avatarPts}>{myScore?.totalPoints ?? 0} pts</Text>
           </View>
 
@@ -103,7 +103,7 @@ export default function SettingsScreen() {
                 <Image source={AVATAR_ASSETS[partnerAvatarChoice]} style={styles.avatarImg} resizeMode="contain" />
               </View>
             </View>
-            <Text style={styles.avatarName}>{household?.member2Name ?? 'Partner'}</Text>
+            <Text style={styles.avatarName}>{partnerScoreItem?.userName?.split(' ')[0] ?? 'Partner'}</Text>
             <Text style={styles.avatarPts}>{partnerScoreItem?.totalPoints ?? 0} pts</Text>
           </View>
         </View>

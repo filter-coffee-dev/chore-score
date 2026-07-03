@@ -258,8 +258,8 @@ export default function HistoryScreen() {
   const jordanPts = partnerScore?.totalPoints ?? 0;
   const total    = samPts + jordanPts || 1;
   const samPct   = Math.round((samPts / total) * 100);
-  const myName      = household?.member1Name ?? myScore?.userName?.split(' ')[0] ?? 'You';
-  const partnerName = household?.member2Name ?? partnerScore?.userName?.split(' ')[0] ?? 'Partner';
+  const myName      = myScore?.userName?.split(' ')[0] ?? 'You';
+  const partnerName = partnerScore?.userName?.split(' ')[0] ?? 'Partner';
   const chartData   = computeChartData(completions, userId ?? '', range);
   const rangeTitle  = range === '7d' ? 'LAST 7 DAYS' : range === '6w' ? 'LAST 6 WEEKS' : 'LAST 6 MONTHS';
 
