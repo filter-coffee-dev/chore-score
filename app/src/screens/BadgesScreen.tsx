@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { View, Text, ScrollView, StyleSheet, RefreshControl, Image, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, RefreshControl, Image, ActivityIndicator, StatusBar } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useFocusEffect } from '@react-navigation/native';
@@ -81,6 +81,7 @@ export default function BadgesScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#c8e0d4" />
       <ScrollView
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />}
         contentContainerStyle={styles.scroll}
@@ -160,7 +161,7 @@ export default function BadgesScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: '#c8e0d4' },
   scroll: { paddingBottom: spacing.xl },
 
   // Header

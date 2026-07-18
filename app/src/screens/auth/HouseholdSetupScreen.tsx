@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   View, Text, TextInput, TouchableOpacity, StyleSheet,
-  ScrollView,
+  ScrollView, StatusBar,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { api } from '../../services/api';
@@ -86,16 +86,16 @@ export default function HouseholdSetupScreen() {
   if (mode === 'create') {
     return (
       <SafeAreaView style={styles.safe}>
-        <View style={styles.container}>
-          <TouchableOpacity onPress={() => setMode('choose')} style={styles.backWrap}>
-            <Text style={styles.back}>← Back</Text>
-          </TouchableOpacity>
+        <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+        <TouchableOpacity onPress={() => setMode('choose')} style={styles.backWrap}>
+          <Text style={styles.back}>← Back</Text>
+        </TouchableOpacity>
+        <View style={styles.centeredContent}>
           <Text style={styles.emoji}>✨</Text>
           <Text style={styles.title}>Create your household</Text>
           <Text style={styles.subtitle}>
             You'll get a unique invite code to share with your partner.
           </Text>
-
           <TouchableOpacity style={styles.btn} onPress={handleCreate} disabled={loading}>
             <Text style={styles.btnText}>{loading ? 'Creating...' : 'Create Household 🚀'}</Text>
           </TouchableOpacity>
@@ -106,10 +106,11 @@ export default function HouseholdSetupScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
-      <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-        <TouchableOpacity onPress={() => setMode('choose')} style={styles.backWrap}>
-          <Text style={styles.back}>← Back</Text>
-        </TouchableOpacity>
+      <StatusBar barStyle="dark-content" backgroundColor={colors.background} />
+      <TouchableOpacity onPress={() => setMode('choose')} style={styles.backWrap}>
+        <Text style={styles.back}>← Back</Text>
+      </TouchableOpacity>
+      <ScrollView contentContainerStyle={styles.centeredContent} keyboardShouldPersistTaps="handled">
         <Text style={styles.emoji}>🔗</Text>
         <Text style={styles.title}>Join a household</Text>
         <Text style={styles.subtitle}>
@@ -138,9 +139,23 @@ export default function HouseholdSetupScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.background },
-  container: { flex: 1, padding: spacing.xl, justifyContent: 'center' },
-  backWrap: { marginBottom: spacing.xl },
-  back: { color: colors.primary, fontSize: fontSize.md, fontWeight: '600' },
+  backWrap: {
+    paddingHorizontal: spacing.lg,
+    paddingTop: spacing.md,
+    paddingBottom: spacing.sm,
+    alignSelf: 'flex-start',
+  },
+  back: {
+    color: colors.primary,
+    fontSize: fontSize.md,
+    fontWeight: '700',
+    backgroundColor: 'rgba(83,166,135,0.12)',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: radius.full,
+    overflow: 'hidden',
+  },
+  centeredContent: { flexGrow: 1, padding: spacing.xl, justifyContent: 'center' },
   emoji: { fontSize: 64, textAlign: 'center', marginBottom: spacing.md },
   title: { fontSize: fontSize.xxl, fontWeight: '800', color: colors.text.primary, textAlign: 'center', marginBottom: spacing.sm },
   subtitle: { fontSize: fontSize.md, color: colors.text.secondary, textAlign: 'center', marginBottom: spacing.xl },

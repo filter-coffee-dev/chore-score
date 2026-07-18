@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, Image, TouchableOpacity,
-  ActivityIndicator, TextInput, Alert,
+  ActivityIndicator, TextInput, Alert, StatusBar,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -306,6 +306,7 @@ export default function HistoryScreen() {
 
   return (
     <SafeAreaView style={styles.safe} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle="dark-content" backgroundColor="#c8e0d4" />
       <View style={styles.header}>
         <Text style={styles.label}>ALL TIME</Text>
         <Text style={styles.title}>Stats</Text>
@@ -475,7 +476,7 @@ export default function HistoryScreen() {
 // ── Styles ────────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.background },
+  safe: { flex: 1, backgroundColor: '#c8e0d4' },
   header: { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 4 },
   label: { fontSize: 11, fontFamily: fonts.bodyExtraBold, color: '#9EBBA4', letterSpacing: 0.5, textTransform: 'uppercase' },
   title: { fontSize: 22, fontFamily: fonts.headingBold, color: '#16463A', lineHeight: 23, marginTop: 1 },
